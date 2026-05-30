@@ -3,13 +3,28 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Kas Tuntas</title>
+    <title>Kas Tuntas</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="gaya.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: #f8fafc;
+        }
+        .bg-tuntas-green {
+            background-color: #064e3b;
+        }
+        .text-tuntas-green {
+            color: #064e3b;
+        }
+        .border-tuntas-green {
+            border-color: #064e3b;
+        }
+    </style>
 </head>
-<body class="bg-slate-50 pb-24 text-slate-800">
+<body class="bg-slate-50 pb-28 text-slate-800">
 
     <div id="loading" class="loading-overlay hidden">
         <div class="text-center">
@@ -18,192 +33,256 @@
         </div>
     </div>
 
-    <header class="bg-white border-b border-slate-100 sticky top-0 z-50 px-4 py-3 flex items-center justify-between shadow-sm">
-        <div class="flex items-center space-x-3">
-            <img src="logo.png" alt="Logo Kas Tuntas" class="h-8 w-auto object-contain">
-            <span class="font-bold text-sm text-emerald-800 tracking-wide uppercase">Kas Tuntas Admin</span>
-        </div>
-        <div class="bg-emerald-50 text-emerald-700 text-xs font-bold px-3 py-1.5 rounded-full">
-            <i class="fas fa-user-shield mr-1"></i> Admin Panel
-        </div>
-    </header>
+    <div class="max-w-md mx-auto bg-[#fafbfc] min-h-screen relative shadow-md">
 
-    <main class="max-w-md mx-auto p-4 animate-fade-in">
-        
-        <section id="menu-bayar" class="menu-content space-y-4">
-            <div class="bg-gradient-to-r from-emerald-600 to-teal-600 rounded-3xl p-5 text-white shadow-lg shadow-emerald-900/10">
-                <h1 class="text-xl font-extrabold tracking-tight">Input Transaksi Baru</h1>
-                <p class="text-emerald-100 text-xs mt-1">Pilih kategori tab di bawah untuk memproses input kas atau pembayaran.</p>
+        <header class="px-5 py-4 flex items-center justify-between bg-white border-b border-slate-50">
+            <div class="flex items-center space-x-2">
+                <img src="logo.png" alt="Logo" class="h-7 w-auto object-contain" onerror="this.src='https://via.placeholder.com/30?text=T';">
+                <span class="font-extrabold text-xl text-slate-800 tracking-tight">Tuntas.</span>
             </div>
-
-            <div class="flex bg-slate-200/60 p-1 rounded-2xl gap-1">
-                <button onclick="switchSubTab('sub-kas')" id="btn-sub-kas" class="w-1/2 py-2.5 rounded-xl font-bold text-xs transition-all bg-white text-emerald-700 shadow-sm">
-                    <i class="fas fa-wallet mr-1"></i> Form KAS
-                </button>
-                <button onclick="switchSubTab('sub-pembayaran')" id="btn-sub-pembayaran" class="w-1/2 py-2.5 rounded-xl font-bold text-xs transition-all text-slate-500 hover:text-slate-800">
-                    <i class="fas fa-receipt mr-1"></i> Form PEMBAYARAN
-                </button>
-            </div>
-
-            <div id="form-kas-container" class="bg-white rounded-3xl p-5 border border-slate-100 shadow-sm space-y-4">
-                <h3 class="font-bold text-sm text-slate-700 border-b pb-2"><i class="fas fa-arrow-right text-emerald-500 mr-1"></i> Transaksi Sheet KAS</h3>
-                <form id="formKas" onsubmit="submitForm(event, 'kas')">
-                    <div class="space-y-3">
-                        <div>
-                            <label class="block text-xs font-bold text-slate-500 mb-1.5">Tanggal</label>
-                            <input type="date" name="tanggal" required class="modern-in">
-                        </div>
-                        <div>
-                            <label class="block text-xs font-bold text-slate-500 mb-1.5">Kategori</label>
-                            <select name="kategori" required class="modern-in">
-                                <option value="" disabled selected>Pilih Kategori</option>
-                                <option value="Kas Masuk">Kas Masuk</option>
-                                <option value="Kas Keluar">Kas Keluar</option>
-                            </select>
-                        </div>
-                        <div>
-                            <label class="block text-xs font-bold text-slate-500 mb-1.5">Keterangan</label>
-                            <input type="text" name="keterangan" placeholder="Contoh: Iuran Bulanan Mandiri, Beli Sapu" required class="modern-in">
-                        </div>
-                        <div>
-                            <label class="block text-xs font-bold text-slate-500 mb-1.5">Nominal (Rp)</label>
-                            <input type="number" name="nominal" placeholder="0" required class="modern-in">
-                        </div>
-                        <button type="submit" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs py-3.5 rounded-2xl shadow-md transition-all mt-2">
-                            SIMPAN KE SHEET KAS
-                        </button>
-                    </div>
-                </form>
-            </div>
-
-            <div id="form-pembayaran-container" class="bg-white rounded-3xl p-5 border border-slate-100 shadow-sm space-y-4 hidden">
-                <h3 class="font-bold text-sm text-slate-700 border-b pb-2"><i class="fas fa-arrow-right text-teal-500 mr-1"></i> Transaksi Sheet PEMBAYARAN</h3>
-                <form id="formPembayaran" onsubmit="submitForm(event, 'pembayaran')">
-                    <div class="space-y-3">
-                        <div class="grid grid-cols-2 gap-3">
-                            <div>
-                                <label class="block text-xs font-bold text-slate-500 mb-1.5">Kode</label>
-                                <input type="text" name="kode" placeholder="K-001" required class="modern-in">
-                            </div>
-                            <div>
-                                <label class="block text-xs font-bold text-slate-500 mb-1.5">Nama</label>
-                                <input type="text" name="nama" placeholder="Nama Anggota" required class="modern-in">
-                            </div>
-                        </div>
-                        <div>
-                            <label class="block text-xs font-bold text-slate-500 mb-1.5">Tanggal</label>
-                            <input type="date" name="tanggal" required class="modern-in">
-                        </div>
-                        <div>
-                            <label class="block text-xs font-bold text-slate-500 mb-1.5">Keterangan</label>
-                            <input type="text" name="keterangan" placeholder="Contoh: Pembayaran Kas Januari" required class="modern-in">
-                        </div>
-                        <div>
-                            <label class="block text-xs font-bold text-slate-500 mb-1.5">Nominal (Rp)</label>
-                            <input type="number" name="nominal" placeholder="0" required class="modern-in">
-                        </div>
-                        <button type="submit" class="w-full bg-teal-600 hover:bg-teal-700 text-white font-bold text-xs py-3.5 rounded-2xl shadow-md transition-all mt-2">
-                            SIMPAN KE SHEET PEMBAYARAN
-                        </button>
-                    </div>
-                </form>
-            </div>
-        </section>
-
-        <section id="menu-home" class="menu-content hidden space-y-4">
-            <div class="bg-white p-6 rounded-3xl border border-slate-100 shadow-sm text-center">
-                <i class="fas fa-home text-4xl text-emerald-500 mb-3"></i>
-                <h2 class="text-lg font-bold">Dashboard Home</h2>
-                <p class="text-xs text-slate-400 mt-1">Selamat datang kembali di sistem Admin Kas Tuntas.</p>
-            </div>
-        </section>
-
-        <section id="menu-anggota" class="menu-content hidden space-y-4">
-            <div class="bg-white p-6 rounded-3xl border border-slate-100 shadow-sm text-center">
-                <i class="fas fa-users text-4xl text-blue-500 mb-3"></i>
-                <h2 class="text-lg font-bold">Data Anggota</h2>
-                <p class="text-xs text-slate-400 mt-1">Halaman manajemen daftar anggota aktif.</p>
-            </div>
-        </section>
-
-        <section id="menu-rekap" class="menu-content hidden space-y-4">
-            <div class="bg-white p-6 rounded-3xl border border-slate-100 shadow-sm text-center">
-                <i class="fas fa-chart-pie text-4xl text-indigo-500 mb-3"></i>
-                <h2 class="text-lg font-bold">Rekapitulasi Dana</h2>
-                <p class="text-xs text-slate-400 mt-1">Laporan grafik total kas masuk dan keluar secara menyeluruh.</p>
-            </div>
-        </section>
-
-        <section id="menu-sampah" class="menu-content hidden space-y-4">
-            <div class="bg-white p-6 rounded-3xl border border-slate-100 shadow-sm text-center">
-                <i class="fas fa-trash-alt text-4xl text-rose-500 mb-3"></i>
-                <h2 class="text-lg font-bold">Trash / Log Dihapus</h2>
-                <p class="text-xs text-slate-400 mt-1">Melihat atau mengembalikan data riwayat yang dihapus.</p>
-            </div>
-        </section>
-    </main>
-
-    <div id="modalNotif" class="modal">
-        <div class="modal-content text-center space-y-3">
-            <div id="modalIcon" class="text-4xl"></div>
-            <h4 id="modalTitle" class="font-bold text-base text-slate-800">Selesai!</h4>
-            <p id="modalMsg" class="text-xs text-slate-500 leading-relaxed">Data transaksi Anda berhasil terekam ke sistem cloud.</p>
-            <button onclick="closeModal()" class="w-full bg-slate-800 hover:bg-slate-950 text-white font-bold text-xs py-3 rounded-2xl transition-all">
-                Mengerti
+            <button onclick="reloadData()" class="bg-[#f1f5f9] hover:bg-slate-200 text-slate-500 font-bold text-[10px] tracking-wider uppercase px-3 py-2 rounded-full flex items-center space-x-1.5 transition-all">
+                <i class="fas fa-rotate fa-sm"></i>
+                <span>Reload Data</span>
             </button>
+        </header>
+
+        <main class="p-5 space-y-5 animate-fade-in">
+
+            <section id="menu-home" class="menu-content space-y-4">
+                
+                <div class="bg-white rounded-3xl p-5 shadow-sm border border-slate-100/80 space-y-4">
+                    <div class="flex justify-between items-center">
+                        <span class="text-[10px] font-extrabold tracking-wider text-slate-400 uppercase">Filter Laporan</span>
+                        <button class="bg-[#edfcf6] hover:bg-emerald-100 text-[#059669] font-bold text-xs px-3 py-1.5 rounded-xl flex items-center space-x-1.5 transition-all">
+                            <i class="fas fa-file-pdf"></i>
+                            <span>PDF</span>
+                        </button>
+                    </div>
+                    
+                    <div class="grid grid-cols-2 gap-3">
+                        <div>
+                            <label class="block text-[10px] font-extrabold text-slate-400 uppercase mb-1 tracking-wider">Dari</label>
+                            <input type="date" value="2026-04-30" class="w-full bg-[#f1f5f9] border-0 text-slate-700 text-xs font-bold py-3 px-4 rounded-2xl focus:outline-none">
+                        </div>
+                        <div>
+                            <label class="block text-[10px] font-extrabold text-slate-400 uppercase mb-1 tracking-wider">Sampai</label>
+                            <input type="date" value="2026-05-30" class="w-full bg-[#f1f5f9] border-0 text-slate-700 text-xs font-bold py-3 px-4 rounded-2xl focus:outline-none">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-tuntas-green rounded-[32px] p-6 text-white shadow-lg shadow-emerald-950/10 space-y-5">
+                    <div class="space-y-1">
+                        <span class="text-[10px] font-bold tracking-widest text-emerald-300/80 uppercase">Saldo Periode (Filter)</span>
+                        <h2 class="text-3xl font-extrabold tracking-tight">Rp 122.000</h2>
+                    </div>
+                    
+                    <div class="border-t border-emerald-800/60 pt-4 flex justify-between items-center">
+                        <span class="text-[10px] font-bold tracking-wider text-emerald-200/70 uppercase">Total Saldo Bersih:</span>
+                        <span class="text-xs font-extrabold text-white">Rp 122.000</span>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-2 gap-4">
+                    <div class="bg-white rounded-2xl p-4 shadow-sm border border-slate-100/80 text-center space-y-1">
+                        <span class="text-[9px] font-extrabold tracking-wider text-emerald-500 uppercase">Masuk (Filter)</span>
+                        <p class="text-base font-extrabold text-slate-800">Rp 125.000</p>
+                    </div>
+                    <div class="bg-white rounded-2xl p-4 shadow-sm border border-slate-100/80 text-center space-y-1">
+                        <span class="text-[9px] font-extrabold tracking-wider text-rose-500 uppercase">Keluar (Filter)</span>
+                        <p class="text-base font-extrabold text-slate-800">Rp 3.000</p>
+                    </div>
+                </div>
+
+                <button onclick="switchMenu('bayar', document.getElementById('nav-bayar'))" class="w-full border-2 border-tuntas-green text-tuntas-green hover:bg-emerald-50 font-extrabold text-xs py-3.5 rounded-full tracking-wider uppercase transition-all shadow-sm">
+                    Catat Kas Umum
+                </button>
+
+                <div class="space-y-3 pt-2">
+                    <span class="text-[10px] font-extrabold tracking-wider text-slate-400 uppercase block">Histori Transaksi Terfilter</span>
+                    
+                    <div class="bg-white rounded-2xl p-4 shadow-sm border border-slate-100/60 flex items-center justify-between">
+                        <div class="flex items-center space-x-3">
+                            <div class="bg-[#edfcf6] text-[#059669] w-10 h-10 rounded-xl flex items-center justify-center font-extrabold text-xs tracking-wider">
+                                IN
+                            </div>
+                            <div>
+                                <h4 class="font-extrabold text-xs text-slate-800 tracking-tight">IURAN: AJI (MEI)</h4>
+                                <p class="text-[10px] text-slate-400 font-medium mt-0.5">29/5/2026</p>
+                            </div>
+                        </div>
+                        <div class="flex items-center space-x-3">
+                            <span class="text-xs font-extrabold text-emerald-600">+ 40,000</span>
+                            <button class="text-slate-300 hover:text-rose-500 transition-all">
+                                <i class="far fa-trash-can text-sm"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+            </section>
+
+            <section id="menu-warga" class="menu-content hidden space-y-4">
+                <div class="bg-white p-6 rounded-3xl border border-slate-100 shadow-sm text-center">
+                    <svg class="w-10 h-10 text-emerald-600 mx-auto mb-2" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
+                    <h2 class="text-base font-bold">Data Warga / Anggota</h2>
+                    <p class="text-xs text-slate-400">Pengelolaan daftar nama anggota komunitas.</p>
+                </div>
+            </section>
+
+            <section id="menu-rekap" class="menu-content hidden space-y-4">
+                <div class="bg-white p-6 rounded-3xl border border-slate-100 shadow-sm text-center">
+                    <svg class="w-10 h-10 text-emerald-600 mx-auto mb-2" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path></svg>
+                    <h2 class="text-base font-bold">Rekapitulasi Buku Kas</h2>
+                    <p class="text-xs text-slate-400">Visualisasi statistik laporan keuangan periode ini.</p>
+                </div>
+            </section>
+
+            <section id="menu-bayar" class="menu-content hidden space-y-4">
+                <div class="flex bg-slate-200/60 p-1 rounded-2xl gap-1">
+                    <button onclick="switchSubTab('sub-kas')" id="btn-sub-kas" class="w-1/2 py-2.5 rounded-xl font-bold text-xs transition-all bg-white text-emerald-700 shadow-sm">
+                        <i class="fas fa-wallet mr-1"></i> Form KAS
+                    </button>
+                    <button onclick="switchSubTab('sub-pembayaran')" id="btn-sub-pembayaran" class="w-1/2 py-2.5 rounded-xl font-bold text-xs transition-all text-slate-500 hover:text-slate-800">
+                        <i class="fas fa-receipt mr-1"></i> Form PEMBAYARAN
+                    </button>
+                </div>
+
+                <div id="form-kas-container" class="bg-white rounded-3xl p-5 border border-slate-100 shadow-sm space-y-4">
+                    <h3 class="font-bold text-sm text-slate-700 border-b pb-2"><i class="fas fa-arrow-right text-emerald-500 mr-1"></i> Transaksi Sheet KAS</h3>
+                    <form id="formKas" onsubmit="submitForm(event, 'kas')">
+                        <div class="space-y-3">
+                            <div>
+                                <label class="block text-xs font-bold text-slate-500 mb-1.5">Tanggal</label>
+                                <input type="date" name="tanggal" required class="modern-in">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-slate-500 mb-1.5">Kategori</label>
+                                <select name="kategori" required class="modern-in">
+                                    <option value="" disabled selected>Pilih Kategori</option>
+                                    <option value="Kas Masuk">Kas Masuk</option>
+                                    <option value="Kas Keluar">Kas Keluar</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-slate-500 mb-1.5">Keterangan</label>
+                                <input type="text" name="keterangan" placeholder="Contoh: Iuran Bulanan Mandiri" required class="modern-in">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-slate-500 mb-1.5">Nominal (Rp)</label>
+                                <input type="number" name="nominal" placeholder="0" required class="modern-in">
+                            </div>
+                            <button type="submit" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs py-3.5 rounded-2xl shadow-md transition-all mt-2">
+                                SIMPAN KE SHEET KAS
+                            </button>
+                        </div>
+                    </form>
+                </div>
+
+                <div id="form-pembayaran-container" class="bg-white rounded-3xl p-5 border border-slate-100 shadow-sm space-y-4 hidden">
+                    <h3 class="font-bold text-sm text-slate-700 border-b pb-2"><i class="fas fa-arrow-right text-teal-500 mr-1"></i> Transaksi Sheet PEMBAYARAN</h3>
+                    <form id="formPembayaran" onsubmit="submitForm(event, 'pembayaran')">
+                        <div class="space-y-3">
+                            <div class="grid grid-cols-2 gap-3">
+                                <div>
+                                    <label class="block text-xs font-bold text-slate-500 mb-1.5">Kode</label>
+                                    <input type="text" name="kode" placeholder="K-001" required class="modern-in">
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-bold text-slate-500 mb-1.5">Nama</label>
+                                    <input type="text" name="nama" placeholder="Nama Anggota" required class="modern-in">
+                                </div>
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-slate-500 mb-1.5">Tanggal</label>
+                                <input type="date" name="tanggal" required class="modern-in">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-slate-500 mb-1.5">Keterangan</label>
+                                <input type="text" name="keterangan" placeholder="Pembayaran Kas" required class="modern-in">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-slate-500 mb-1.5">Nominal (Rp)</label>
+                                <input type="number" name="nominal" placeholder="0" required class="modern-in">
+                            </div>
+                            <button type="submit" class="w-full bg-teal-600 hover:bg-teal-700 text-white font-bold text-xs py-3.5 rounded-2xl shadow-md transition-all mt-2">
+                                SIMPAN KE SHEET PEMBAYARAN
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </section>
+
+            <section id="menu-sampah" class="menu-content hidden space-y-4">
+                <div class="bg-white p-6 rounded-3xl border border-slate-100 shadow-sm text-center">
+                    <svg class="w-10 h-10 text-rose-500 mx-auto mb-2" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-14v4M1 7h22m-4 0h-3.5M5 7h3.5m0 0V4a2 2 0 012-2h4a2 2 0 012 2v3m-6 0h6"></path></svg>
+                    <h2 class="text-base font-bold text-rose-600">Trash Bin / Data Dihapus</h2>
+                    <p class="text-xs text-slate-400">Riwayat log penghapusan berkas kas.</p>
+                </div>
+            </section>
+
+        </main>
+
+        <div id="modalNotif" class="modal">
+            <div class="modal-content text-center space-y-3">
+                <div id="modalIcon" class="text-4xl"></div>
+                <h4 id="modalTitle" class="font-bold text-base text-slate-800">Selesai!</h4>
+                <p id="modalMsg" class="text-xs text-slate-500 leading-relaxed"></p>
+                <button onclick="closeModal()" class="w-full bg-slate-800 hover:bg-slate-950 text-white font-bold text-xs py-3 rounded-2xl transition-all">
+                    Mengerti
+                </button>
+            </div>
         </div>
+
+        <nav class="fixed bottom-0 inset-x-0 max-w-md mx-auto bg-white border-t border-slate-100 px-2 py-3 flex justify-around items-center z-40 rounded-t-[24px] shadow-[0_-4px_10px_rgba(0,0,0,0.02)]">
+            <button onclick="switchMenu('home', this)" class="flex flex-col items-center space-y-1 py-1 px-3 text-emerald-800 transition-all">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V16zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V16z"></path></svg>
+                <span class="text-[9px] font-extrabold tracking-wider uppercase mt-1">Home</span>
+            </button>
+            <button onclick="switchMenu('warga', this)" class="flex flex-col items-center space-y-1 py-1 px-3 text-slate-400 transition-all">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
+                <span class="text-[9px] font-bold tracking-wider uppercase mt-1">Warga</span>
+            </button>
+            <button onclick="switchMenu('rekap', this)" class="flex flex-col items-center space-y-1 py-1 px-3 text-slate-400 transition-all">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path></svg>
+                <span class="text-[9px] font-bold tracking-wider uppercase mt-1">Rekap</span>
+            </button>
+            <button id="nav-bayar" onclick="switchMenu('bayar', this)" class="flex flex-col items-center space-y-1 py-1 px-3 text-slate-400 transition-all">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                <span class="text-[9px] font-bold tracking-wider uppercase mt-1">Bayar</span>
+            </button>
+            <button onclick="switchMenu('sampah', this)" class="flex flex-col items-center space-y-1 py-1 px-3 text-slate-400 transition-all">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-14v4M1 7h22m-4 0h-3.5M5 7h3.5m0 0V4a2 2 0 012-2h4a2 2 0 012 2v3m-6 0h6"></path></svg>
+                <span class="text-[9px] font-bold tracking-wider uppercase mt-1 text-rose-500">Sampah</span>
+            </button>
+        </nav>
     </div>
 
-    <nav class="fixed bottom-0 inset-x-0 bg-white/95 backdrop-blur-md border-t border-slate-100 shadow-[0_-4px_12px_rgba(0,0,0,0.03)] px-2 py-2 flex justify-around items-center z-40 max-w-md mx-auto rounded-t-3xl">
-        <button onclick="switchMenu('home', this)" class="flex flex-col items-center space-y-1 py-1 px-3 text-slate-400 transition-all">
-            <i class="fas fa-home text-sm"></i><span class="text-[10px] font-bold">Home</span>
-        </button>
-        <button onclick="switchMenu('anggota', this)" class="flex flex-col items-center space-y-1 py-1 px-3 text-slate-400 transition-all">
-            <i class="fas fa-users text-sm"></i><span class="text-[10px] font-bold">Anggota</span>
-        </button>
-        <button onclick="switchMenu('rekap', this)" class="flex flex-col items-center space-y-1 py-1 px-3 text-slate-400 transition-all">
-            <i class="fas fa-chart-bar text-sm"></i><span class="text-[10px] font-bold">Rekap</span>
-        </button>
-        <button onclick="switchMenu('bayar', this)" class="flex flex-col items-center space-y-1 py-1 px-3 text-emerald-600 transition-all scale-105">
-            <i class="fas fa-money-bill-wave text-sm"></i><span class="text-[10px] font-extrabold">Bayar</span>
-        </button>
-        <button onclick="switchMenu('sampah', this)" class="flex flex-col items-center space-y-1 py-1 px-3 text-slate-400 transition-all">
-            <i class="fas fa-trash text-sm"></i><span class="text-[10px] font-bold">Sampah</span>
-        </button>
-        <button onclick="triggerLogout()" class="flex flex-col items-center space-y-1 py-1 px-3 text-rose-500 hover:text-rose-700 transition-all">
-            <i class="fas fa-sign-out-alt text-sm"></i><span class="text-[10px] font-bold">Logout</span>
-        </button>
-    </nav>
-
     <script>
-        // Konfigurasi Deployment GAS Web App Anda
         const GAS_WEB_APP_URL = "https://script.google.com/macros/s/AKfycbzfO1n4pRZW-h3hJXcN4mqSR9vEbxNPhHBxxw0WWi748YoFX6LRXOIZpqltBfBCApvsew/exec";
 
-        // Fungsi Navigasi SPA Bawah
         function switchMenu(menuId, element) {
             document.querySelectorAll('.menu-content').forEach(section => section.classList.add('hidden'));
             document.getElementById(`menu-${menuId}`).classList.remove('hidden');
             
-            // Set style active state pada navigasi button
             const navButtons = element.parentElement.querySelectorAll('button');
             navButtons.forEach(btn => {
                 btn.className = "flex flex-col items-center space-y-1 py-1 px-3 text-slate-400 transition-all";
-                btn.querySelector('span').className = "text-[10px] font-bold";
+                btn.querySelector('span').className = "text-[9px] font-bold tracking-wider uppercase mt-1";
             });
 
-            if(menuId === 'bayar') {
-                element.className = "flex flex-col items-center space-y-1 py-1 px-3 text-emerald-600 transition-all scale-105";
-                element.querySelector('span').className = "text-[10px] font-extrabold";
+            if(menuId === 'home') {
+                element.className = "flex flex-col items-center space-y-1 py-1 px-3 text-emerald-800 transition-all";
+                element.querySelector('span').className = "text-[9px] font-extrabold tracking-wider uppercase mt-1";
             } else if (menuId === 'sampah') {
-                element.className = "flex flex-col items-center space-y-1 py-1 px-3 text-rose-500 transition-all scale-105";
-                element.querySelector('span').className = "text-[10px] font-extrabold";
+                element.className = "flex flex-col items-center space-y-1 py-1 px-3 text-rose-600 transition-all";
+                element.querySelector('span').className = "text-[9px] font-extrabold tracking-wider uppercase mt-1";
             } else {
-                element.className = "flex flex-col items-center space-y-1 py-1 px-3 text-blue-600 transition-all scale-105";
-                element.querySelector('span').className = "text-[10px] font-extrabold";
+                element.className = "flex flex-col items-center space-y-1 py-1 px-3 text-emerald-700 transition-all";
+                element.querySelector('span').className = "text-[9px] font-extrabold tracking-wider uppercase mt-1";
             }
         }
 
-        // Fungsi Switch Sub-Tab di Form Input (Kas / Pembayaran)
         function switchSubTab(target) {
             const btnKas = document.getElementById('btn-sub-kas');
             const btnBayar = document.getElementById('btn-sub-pembayaran');
@@ -223,41 +302,42 @@
             }
         }
 
-        // Mengirimkan Data Form ke Google Apps Script
         function submitForm(event, jenisSheet) {
             event.preventDefault();
-            
             const loading = document.getElementById('loading');
-            loading.classList.remove('hidden'); // Memunculkan loader dari gaya.css
+            loading.classList.remove('hidden');
 
             const formElement = event.target;
             const formData = new FormData(formElement);
             
-            // Konversi objek form data
             const dataObj = {};
             formData.forEach((value, key) => { dataObj[key] = value; });
-            dataObj['targetSheet'] = jenisSheet; // Menandai target pengiriman sheet
+            dataObj['targetSheet'] = jenisSheet;
 
-            // Kirim data menggunakan Fetch API Cross-Origin CORS
             fetch(GAS_WEB_APP_URL, {
                 method: 'POST',
-                mode: 'no-cors', // Penting untuk bypass Google App Script CORS Policy redirection
+                mode: 'no-cors',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(dataObj)
             })
             .then(() => {
                 loading.classList.add('hidden');
-                showModal('✓', 'Berhasil Disimpan!', `Transaksi berhasil ditambahkan ke sheet ${jenisSheet.toUpperCase()}.`);
+                showModal('✓', 'Berhasil Disimpan!', `Transaksi kas berhasil dimasukkan ke cloud.`);
                 formElement.reset();
             })
             .catch(error => {
                 loading.classList.add('hidden');
-                showModal('✕', 'Gagal Mengirim', 'Terjadi kesalahan jaringan atau script error.', true);
-                console.error('Error:', error);
+                showModal('✕', 'Gagal Mengirim', 'Koneksi bermasalah.', true);
+                console.error(error);
             });
         }
 
-        // Modal triggers (gaya.css modal management)
+        function reloadData() {
+            const loading = document.getElementById('loading');
+            loading.classList.remove('hidden');
+            setTimeout(() => { loading.classList.add('hidden'); }, 800);
+        }
+
         function showModal(icon, title, message, isError = false) {
             const modal = document.getElementById('modalNotif');
             document.getElementById('modalIcon').innerText = icon;
@@ -270,14 +350,6 @@
         function closeModal() {
             document.getElementById('modalNotif').classList.remove('active');
         }
-
-        function triggerLogout() {
-            if(confirm("Apakah Anda yakin ingin logout dari panel Admin?")) {
-                alert("Berhasil keluar.");
-                window.location.reload();
-            }
-        }
     </script>
 </body>
-  </html>
-                  
+</html>
