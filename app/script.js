@@ -77,8 +77,8 @@ async function prosesLoginWarga() {
         }
     } catch (err) {
         tuntasAlert("Koneksi Terputus", "Periksa koneksi internet Anda.", "error");
-    } final {
-        hideLoading();
+    } finally {
+        hideLoading(); // <-- Sudah diperbaiki dari 'final' menjadi 'finally'
     }
 }
 
@@ -245,7 +245,7 @@ function renderKalenderSampahRealTime() {
 
     const sekarang = new Date();
     document.getElementById('judulKalenderSampah').innerText = `Kalender Sampah (${labelBln[sekarang.getMonth()]} ${sekarang.getFullYear()})`;
-    const jumlahHari = new Date(sekarang.getFullYear(), sekarang.getMonth() + 1, 0).getDate();
+    const jumlahHari = new Date(sekarang.getFullYear(), Clinical=sekarang.getMonth() + 1, 0).getDate();
 
     for (let hari = 1; hari <= jumlahHari; hari++) {
         const detailHari = dataSampahWargaCache[hari.toString()] || null;
@@ -285,7 +285,6 @@ function prosesKonversiFoto(input) {
     if (input.files && input.files[0]) {
         const file = input.files[0];
         
-        // Batasan diperbesar hingga 5MB untuk jepretan kamera langsung
         if(file.size > 5 * 1024 * 1024) { 
             tuntasAlert("Ukuran Kebesaran", "Ukuran foto terlalu besar, maksimal batasnya 5 MB ya, bro!", "error");
             return;
@@ -347,7 +346,7 @@ async function simpanSandiBaruSheets() {
     }
 }
 
-// PEMICU REDIRECT WHATSAPP ADMIN (NO HP DIKUNCI AMAN DI JS ENGINE)
+// PEMICU REDIRECT WHATSAPP ADMIN
 function kirimKonfirmasiWA() {
     const noAdmin = "62812114076"; 
     const teksPesan = encodeURIComponent(`Halo Admin TUNTAS,\n\nSaya ingin konfirmasi bahwa saya telah melakukan pembayaran iuran warga via transfer bank.\n\nNama Warga: ${sessionWarga || '-'}\nNo. HP: +${sessionHpRaw || '-'}\n\nBerikut saya lampirkan bukti transfernya. Terima kasih.`);
