@@ -2,8 +2,8 @@
 // TUNTAS SYSTEM - FRONTEND ENGINE FOR E-KUITANSI (GOOGLE SHEETS INTEGRATION)
 // =========================================================================
 
-// ⚠️ SILAKAN GANTI DENGAN URL WEB APP GOOGLE APPS SCRIPT (GAS) MILIKMU YANG BARU ⚠️
-const GAS_DEPLOY_URL = "https://script.google.com/macros/s/AKfycbzXXXXXXXXXXXXX/exec";
+// URL Web App Google Apps Script (GAS) milikmu
+const GAS_DEPLOY_URL = "https://script.google.com/macros/s/AKfycbwI8UM92CtLbTAE5F8UVjnm3qT-8ITco_-bPIQIjBfokGojFhYkRfl0YP9zCpVaRfTIpg/exec";
 
 // 1. Ambil Parameter ID (?id=T-xxxxxx) dari URL Browser Warga
 const urlParams = new URLSearchParams(window.location.search);
