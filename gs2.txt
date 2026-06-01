@@ -1,0 +1,231 @@
+/**
+ * TUNTAS SYSTEM - BACKEND ENGINE (Google Apps Script)
+ * Fitur: Mengelola Data Database, Ganti Password, Mengunggah Foto Kamera ke Google Drive, & Pembaca Kuitansi Realtime
+ */
+
+// Konfigurasi ID Database & Folder Penyimpanan Foto Baru (Satu Akun)
+var SPREADSHEET_ID = "1EMMQM2aDZu-iOH4yw97-CxxlEGhhMs9EFx_L_kQCBm8";
+var DRIVE_FOLDER_ID = "1FNIuGWMADgYO2Kk-KLmemSKmDzu46LM1"; // <-- Sudah update pakai ID baru kamu, bro!
+
+/**
+ * 1. MENANGANI REQUEST GET (doGet)
+ */
+function doGet(e) {
+  try {
+    var ss = SpreadsheetApp.openById(SPREADSHEET_ID);
+    var action = e.parameter.action;
+
+    // --- INTEGRASI BARU: FITUR PEMBACA DATA KUITANSI REALTIME ---
+    if (action === "getKuitansi") {
+      var idKuitansi = e.parameter.id;
+      if (!idKuitansi) {
+        return ContentService.createTextOutput(JSON.stringify({ status: "error", message: "ID parameter tidak ditemukan" }))
+          .setMimeType(ContentService.MimeType.JSON);
+      }
+
+      var sheetPembayaran = ss.getSheetByName("pembayaran");
+      if (!sheetPembayaran) {
+        return ContentService.createTextOutput(JSON.stringify({ status: "error", message: "Sheet pembayaran tidak ditemukan" }))
+          .setMimeType(ContentService.MimeType.JSON);
+      }
+
+      var dataRows = sheetPembayaran.getDataRange().getValues();
+      var headers = dataRows[0];
+      
+      // Cari indeks kolom berdasarkan nama header (flexibel dan aman jika posisi kolom berubah)
+      var idxKode = headers.indexOf("kode");
+      var idxNama = headers.indexOf("nama");
+      var idxTanggal = headers.indexOf("tanggal");
+      var idxKeterangan = headers.indexOf("keterangan");
+      var idxNominal = headers.indexOf("nominal");
+
+      // Fallback jika header menggunakan huruf kapital awal
+      if (idxKode === -1) idxKode = headers.indexOf("Kode");
+      if (idxNama === -1) idxNama = headers.indexOf("Nama");
+      if (idxTanggal === -1) idxTanggal = headers.indexOf("Tanggal");
+      if (idxKeterangan === -1) idxKeterangan = headers.indexOf("Keterangan");
+      if (idxNominal === -1) idxNominal = headers.indexOf("Nominal");
+
+      // Melakukan loop pencarian ID data (mulai dari baris index ke-1 setelah header)
+      for (var i = 1; i < dataRows.length; i++) {
+        var row = dataRows[i];
+        var valKode = row[idxKode !== -1 ? idxKode : 0].toString().trim();
+
+        if (valKode === idKuitansi.trim()) {
+          var valTgl = row[idxTanggal !== -1 ? idxTanggal : 2];
+          var formatTgl = valTgl;
+          
+          // Konversi objek tanggal bawaan Google Sheet menjadi string format YYYY-MM-DD standar web
+          if (valTgl instanceof Date) {
+            formatTgl = Utilities.formatDate(valTgl, Session.getScriptTimeZone(), "yyyy-MM-dd");
+          }
+
+          var hasilKuitansi = {
+            sukses: true,
+            kode: valKode,
+            nama: row[idxNama !== -1 ? idxNama : 1],
+            tgl: formatTgl,
+            bulan: row[idxKeterangan !== -1 ? idxKeterangan : 3],
+            nom: Number(row[idxNominal !== -1 ? idxNominal : 4]) || 0
+          };
+
+          return ContentService.createTextOutput(JSON.stringify(hasilKuitansi))
+            .setMimeType(ContentService.MimeType.JSON);
+        }
+      }
+
+      // Jika looping selesai namun ID kuitansi tidak ditemukan di Sheets
+      return ContentService.createTextOutput(JSON.stringify({ sukses: false, message: "ID tidak ditemukan" }))
+        .setMimeType(ContentService.MimeType.JSON);
+    }
+
+
+    // --- FITUR BAWAAN: AMBIL SEMUA DATA UNTUK ADMIN PANEL ---
+    var resAnggota = readSheetData(ss, "anggota");
+    var resKas = readSheetData(ss, "kas");
+    var resPembayaran = readSheetData(ss, "pembayaran");
+    var resSampah = readSheetData(ss, "sampah");
+    
+    var outputData = {
+      status: "success",
+      data: {
+        anggota: resAnggota,
+        kas: resKas,
+        pembayaran: resPembayaran,
+        sampah: resSampah
+      }
+    };
+    
+    return ContentService.createTextOutput(JSON.stringify(outputData))
+      .setMimeType(ContentService.MimeType.JSON);
+      
+  } catch (err) {
+    return ContentService.createTextOutput(JSON.stringify({ status: "error", message: err.toString() }))
+      .setMimeType(ContentService.MimeType.JSON);
+  }
+}
+
+/**
+ * 2. MENANGANI REQUEST POST (doPost)
+ */
+function doPost(e) {
+  try {
+    var action = e.parameter.action;
+    var ss = SpreadsheetApp.openById(SPREADSHEET_ID);
+    
+    if (action == "updateProfilWarga") {
+      var hp = e.parameter.hp;
+      var passwordBaru = e.parameter.passwordBaru;
+      
+      var postData = e.postData ? e.postData.contents : null;
+      var fotoUrl = null;
+
+      if (postData && e.parameter.filename) {
+        var filename = e.parameter.filename;
+        var mimeType = e.parameter.mimetype;
+        
+        var base64Clean = postData.split(",")[1] || postData;
+        var decoded = Utilities.base64Decode(base64Clean);
+        var blob = Utilities.newBlob(decoded, mimeType, filename);
+        
+        var folder = DriveApp.getFolderById(DRIVE_FOLDER_ID);
+        var file = folder.createFile(blob);
+        
+        // Set izin file agar 'Anyone with link can view' supaya bisa dirender di web
+        file.setSharing(DriveApp.Access.ANYONE_WITH_LINK, DriveApp.Permission.VIEW);
+        
+        fotoUrl = "https://lh3.googleusercontent.com/d/" + file.getId();
+      }
+      
+      var sheet = ss.getSheetByName("anggota");
+      var data = sheet.getDataRange().getValues();
+      var suksesUpdate = false;
+      
+      for (var i = 1; i < data.length; i++) {
+        var dbHp = data[i][1].toString().trim(); 
+        
+        if (dbHp === hp) {
+          if (passwordBaru) {
+            sheet.getRange(i + 1, 3).setValue(passwordBaru);
+          }
+          if (fotoUrl) {
+            sheet.getRange(i + 1, 4).setValue(fotoUrl);
+          }
+          suksesUpdate = true;
+          break;
+        }
+      }
+      
+      if (suksesUpdate) {
+        return ContentService.createTextOutput(JSON.stringify({ 
+          status: "success", 
+          message: "Profil berhasil diperbarui!",
+          newFotoUrl: fotoUrl 
+        })).setMimeType(ContentService.MimeType.JSON);
+      } else {
+        return ContentService.createTextOutput(JSON.stringify({ status: "error", message: "Data warga tidak ditemukan." }))
+          .setMimeType(ContentService.MimeType.JSON);
+      }
+    }
+    
+    return ContentService.createTextOutput(JSON.stringify({ status: "error", message: "Aksi tidak dikenali." }))
+      .setMimeType(ContentService.MimeType.JSON);
+      
+  } catch (err) {
+    return ContentService.createTextOutput(JSON.stringify({ status: "error", message: err.toString() }))
+      .setMimeType(ContentService.MimeType.JSON);
+  }
+}
+
+/**
+ * 3. FUNGSI PEMBANTU (Membaca Sheet Menjadi Format JSON Array)
+ */
+function readSheetData(spreadsheet, sheetName) {
+  var sheet = spreadsheet.getSheetByName(sheetName);
+  if (!sheet) return [];
+  var range = sheet.getDataRange();
+  var values = range.getValues();
+  if (values.length <= 1) return []; 
+  
+  var headers = values[0];
+  var result = [];
+  
+  for (var i = 1; i < values.length; i++) {
+    var row = values[i];
+    var obj = {};
+    var isEmptyRow = true;
+    
+    for (var j = 0; j < headers.length; j++) {
+      var headerName = headers[j].toString().trim();
+      var cellValue = row[j];
+      
+      if (cellValue instanceof Date) {
+        cellValue = Utilities.formatDate(cellValue, Session.getScriptTimeZone(), "yyyy-MM-dd");
+      }
+      if (cellValue !== "") isEmptyRow = false;
+      obj[headerName] = cellValue;
+    }
+    if (!isEmptyRow) result.push(obj);
+  }
+  return result;
+}
+
+/**
+ * 4. KODE PANCINGAN TOTAL LENGKAP (KUNCI PEMBUKA AKSES AKUN BARU)
+ * Wajib jalankan ini sekali setelah copas!
+ */
+function pancingIzinSemua() {
+  // A. Pancing Aktivitas Membuat File di Google Drive Baru
+  var folder = DriveApp.getFolderById(DRIVE_FOLDER_ID);
+  var filePancingan = folder.createFile("test_koneksi.txt", "Satu Akun Lancar", MimeType.PLAIN_TEXT);
+  Logger.log("Izin Tulis Drive OK! File dibuat: " + filePancingan.getName());
+  
+  // Hapus langsung file pancingannya biar gak nyampah
+  filePancingan.setTrashed(true);
+  Logger.log("File dummy berhasil dibersihkan.");
+  
+  // B. Pancing Aktivitas Google Sheets
+  var ss = SpreadsheetApp.openById(SPREADSHEET_ID);
+  var sheet = ss.getSheets()[0];
+  Logger.log("Izin Sheets OK! Nama Sheet Utama: " + sheet.getName());
+}
