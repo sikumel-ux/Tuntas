@@ -1,70 +1,103 @@
-/**
- * TUNTAS ADMIN PANEL - STYLESHEET
- */
-
-body { 
-    font-family: 'Plus Jakarta Sans', sans-serif; 
-    background: #f8fafc; 
-    overscroll-behavior-y: contain;
-    padding-bottom: 6rem;
+/* ==========================================================================
+   RESET & BASE STYLES
+   ========================================================================== */
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    -webkit-tap-highlight-color: transparent;
 }
 
-.tab-content { 
-    display: none; 
+body {
+    font-family: 'Space Grotesk', sans-serif;
+    background-color: #070a13;
+    color: #f8fafc;
+    overflow-x: hidden;
 }
 
-.tab-content.active { 
-    display: block; 
+/* ==========================================================================
+   UI COMPONENTS (GLASSMORPHISM & MODERN UTILITIES)
+   ========================================================================== */
+/* Efek Kaca Transparan Premium */
+.glass {
+    background: rgba(15, 23, 42, 0.65);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    border: 1px solid rgba(255, 255, 255, 0.05);
 }
 
-.modal {
-    display: none;
-    position: fixed;
-    inset: 0;
-    background: rgba(0,0,0,0.5);
-    backdrop-filter: blur(4px);
-    -webkit-backdrop-filter: blur(4px);
-    align-items: center;
-    justify-content: center;
-    padding: 1rem;
+/* Bayangan tegas untuk Header & Nav Bar */
+.shd-b {
+    box-shadow: 0 -4px 24px rgba(0, 0, 0, 0.5);
 }
 
-.modal-content {
-    background: white;
-    padding: 2rem;
-    border-radius: 2rem;
-    width: 100%;
-    max-width: 28rem; /* Setara max-w-md */
-}
-
+/* Desain Input & Select Box Modern */
 .modern-in {
-    width: 100%;
-    padding: 1rem;
-    background: #f8fafc;
-    border: 1px solid #e2e8f0;
-    border-radius: 1rem;
-    font-size: 0.875rem;
-    outline: none;
+    background: rgba(15, 23, 42, 0.8) !important;
+    border: 1px solid rgba(255, 255, 255, 0.08) !important;
+    padding: 0.75rem 1rem !important;
+    border-radius: 0.75rem !important;
+    color: #ffffff !important;
+    width: 100% !important;
+    font-size: 0.875rem !important;
+    transition: all 0.2s ease;
 }
 
-.modern-in:focus { 
-    border-color: #064e3b; 
+.modern-in:focus {
+    outline: none !important;
+    border-color: #3b82f6 !important;
+    box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.25) !important;
 }
 
-nav button.active { 
-    color: #064e3b; 
-    font-weight: 800; 
+/* Custom Scrollbar untuk Daftar Kas/Warga agar rapi di HP */
+::-webkit-scrollbar {
+    width: 4px;
+    height: 4px;
+}
+::-webkit-scrollbar-track {
+    background: rgba(0, 0, 0, 0.1);
+}
+::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 4px;
 }
 
-.table-scroll { 
-    overflow-x: auto; 
-    -webkit-overflow-scrolling: touch; 
+/* ==========================================================================
+   TAB / SCREEN MANAGEMENT (Kunci agar tidak Numpuk)
+   ========================================================================== */
+.tab-content {
+    transition: opacity 0.2s ease-in-out;
 }
 
-.sticky-col { 
-    position: sticky; 
-    left: 0; 
-    background: white; 
-    z-index: 10; 
-    min-width: 100px; 
+/* ==========================================================================
+   FOOTER NAVIGATION BAR BUTTONS (Efek Menyala Terang)
+   ========================================================================== */
+/* Tombol Menu Bawah (Kondisi Redup / Default) */
+.nav-btn {
+    background: rgba(255, 255, 255, 0.02);
+    border: 1px solid rgba(255, 255, 255, 0.04);
+    color: #94a3b8 !important; /* Warna slate-400 redup */
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Hover effect untuk desktop/browser */
+.nav-btn:hover {
+    background: rgba(255, 255, 255, 0.06);
+    color: #f1f5f9 !important;
+}
+
+/* Tombol Menu Bawah Saat AKTIF (Menyala Biru Sempurna) */
+.nav-btn.active {
+    background: #3b82f6 !important; /* Warna Biru Utama */
+    border-color: #3b82f6 !important;
+    color: #ffffff !important; /* Icon & Teks jadi Putih Terang */
+    box-shadow: 0 0 16px rgba(59, 130, 246, 0.45);
+    font-weight: 700;
+}
+
+/* Merubah warna icon di dalam tombol aktif secara otomatis */
+.nav-btn.active i {
+    color: #ffffff !important;
+    transform: scale(1.1);
+    transition: transform 0.2s ease;
 }
