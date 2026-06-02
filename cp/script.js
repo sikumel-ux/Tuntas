@@ -1,9 +1,9 @@
-// ==========================================
-// CONFIG: SILAKAN SESUAIKAN URL API WEB APP KAMU DI SINI
-// ==========================================
+// ==========================================================================
+// CONFIG: URL WEB APP APPS SCRIPT ASLI KAMU SUDAH TERPASANG 100%
+// ==========================================================================
 const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwI8UM92CtLbTAE5F8UVjnm3qT-8ITco_-bPIQIjBfokGojFhYkRfl0YP9zCpVaRfTIpg/exec"; 
 
-// Fungsi Pengendali Tampilan Loading Screen
+// Fungsi Pengendali Loading Screen (Putih - Hijau)
 function showLoading() {
     const loader = document.getElementById('loading');
     if (loader) loader.style.display = 'flex';
@@ -14,7 +14,7 @@ function hideLoading() {
     if (loader) loader.style.display = 'none';
 }
 
-// Fungsi Navigasi Tab Menu Bawah (Mencegah Tumpuk Layar)
+// Fungsi Pindah Tab Menu Bawah (Mencegah Layar Numpuk)
 function bukaTab(targetId) {
     document.querySelectorAll('.tab-content').forEach(el => el.style.display = 'none');
     document.querySelectorAll('nav button').forEach(btn => btn.classList.remove('active'));
@@ -26,74 +26,56 @@ function bukaTab(targetId) {
     if (targetBtn) targetBtn.classList.add('active');
 }
 
-// Fungsi Notifikasi Popup Alert Mandiri
-function tuntasAlert(title, msg, type = "success") {
-    const m = document.getElementById('alertModal');
-    const ico = document.getElementById('alertIcon');
-    document.getElementById('alertTitle').innerText = title;
-    document.getElementById('alertMsg').innerText = msg;
-    
-    if (type === "error") {
-        ico.className = "w-12 h-12 mx-auto rounded-full flex items-center justify-center text-xl bg-red-500/10 text-red-400 border border-red-500/20";
-        ico.innerHTML = '<i class="fa-solid fa-circle-exclamation"></i>';
-    } else {
-        ico.className = "w-12 h-12 mx-auto rounded-full flex items-center justify-center text-xl bg-green-500/10 text-green-400 border border-green-500/20";
-        ico.innerHTML = '<i class="fa-solid fa-circle-check"></i>';
-    }
-    if (m) m.classList.replace('hidden', 'flex');
-}
-
-function tutupAlert() {
-    const m = document.getElementById('alertModal');
-    if (m) m.classList.replace('flex', 'hidden');
-}
-
-// ==========================================
-// CORE ENGINE: HIT DATA GOOGLE SHEETS
-// ==========================================
+// ==========================================================================
+// ENGINE UTAMA: HIT DATA REAL-TIME GOOGLE SHEETS
+// ==========================================================================
 async function loadDataDariSheets() {
     showLoading();
     try {
-        // Simulasi hit API atau Fetch Data dari Web App Apps Script Google Sheets
         const response = await fetch(`${SCRIPT_URL}?action=readData`);
         if (!response.ok) throw new Error("Gagal mengambil data dari Google Sheets");
         
         const data = await response.json();
         
-        // Suntikkan hasil data ke komponen ID di HTML
+        // Suntik data angka & saldo asli dari Google Sheets ke HTML
         document.getElementById('vTotalKas').innerText = data.totalKas || "Rp 0";
-        document.getElementById('vTotalWarga').innerText = data.totalWarga || "0";
+        document.getElementById('vTotalWarga').innerText = (data.totalWarga || "0") + " Warga";
         
-        // Render List Alur Kas Terakhir
+        // Render daftar histori transaksi asli dari Sheets
         const listKas = document.getElementById('listKas');
-        if (listKas && data.alurKas) {
-            listKas.innerHTML = data.alurKas.map(item => `
-                <div class="flex justify-between items-center p-2 bg-white/5 rounded-lg text-xs">
-                    <div>
-                        <p class="font-medium text-white uppercase">${item.nama}</p>
-                        <p class="text-[10px] text-slate-400">${item.tanggal}</p>
+        if (listKas) {
+            if (data.alurKas && data.alurKas.length > 0) {
+                listKas.innerHTML = data.alurKas.map(item => `
+                    <div class="flex justify-between items-center p-3 bg-slate-50 rounded-xl text-xs border border-slate-100">
+                        <div>
+                            <p class="font-bold text-slate-800 uppercase">${item.nama}</p>
+                            <p class="text-[10px] text-slate-400 mt-0.5">${item.tanggal}</p>
+                        </div>
+                        <p class="${item.jenis === 'Masuk' ? 'text-emerald-600' : 'text-red-500'} font-bold text-sm">${item.nominal}</p>
                     </div>
-                    <p class="${item.jenis === 'Masuk' ? 'text-green-400' : 'text-red-400'} font-bold">${item.nominal}</p>
-                </div>
-            `).join('');
+                `).join('');
+            } else {
+                listKas.innerHTML = `<p class="text-xs text-slate-400 text-center py-4">Belum ada data transaksi.</p>`;
+            }
         }
 
-        // Render Dropdown Pilihan Nama Warga di Menu Bayar
+        // Render dropdown pilihan nama warga asli dari Sheets untuk form pembayaran
         const iNama = document.getElementById('iNama');
-        if (iNama && data.daftarWarga) {
-            iNama.innerHTML = data.daftarWarga.map(warga => `
-                <option value="${warga}">${warga.toUpperCase()}</option>
-            `).join('');
+        if (iNama) {
+            if (data.daftarWarga && data.daftarWarga.length > 0) {
+                iNama.innerHTML = data.daftarWarga.map(warga => `
+                    <option value="${warga}">${warga.toUpperCase()}</option>
+                `).join('');
+            } else {
+                iNama.innerHTML = `<option value="">-- Tidak ada data warga --</option>`;
+            }
         }
         
     } catch (error) {
         console.error(error);
-        // Fallback pengaman jika SCRIPT_URL belum kamu isi/masih eror agar data tidak kosongan total saat demo
-        document.getElementById('vTotalKas').innerText = "Rp 2.500.000";
-        document.getElementById('vTotalWarga').innerText = "142";
-        tuntasAlert("Info Sistem", "Menggunakan data lokal pratinjau (ganti SCRIPT_URL untuk data asli Sheets).", "success");
+        alert("Gagal memuat data. Pastikan Apps Script kamu sudah di-Deploy sebagai 'Anyone' (Semua Orang).");
     } finally {
-        hideLoading();
+        hideLoading(); // Matikan loading screen putih, buka dashboard
     }
 }
 
@@ -104,7 +86,7 @@ async function simpanIuran() {
     const nominal = document.getElementById('iNom').value;
 
     if (!tgl || !nama || !nominal) {
-        tuntasAlert("Gagal", "Harap isi semua baris form pembayaran!", "error");
+        alert("Harap isi semua baris form pembayaran!");
         return;
     }
 
@@ -115,35 +97,30 @@ async function simpanIuran() {
             body: JSON.stringify({ action: "insertIuran", tanggal: tgl, nama: nama, nominal: nominal })
         });
         
-        tuntasAlert("Berhasil", "Data iuran warga berhasil disimpan ke Sheets!", "success");
-        loadDataDariSheets(); // Segarkan dashboard saldo
+        alert("Pembayaran berhasil disimpan ke Google Sheets!");
+        
+        // Reset input nominal setelah sukses menyimpan
+        document.getElementById('iNom').value = "";
+        
+        // Segarkan data dashboard otomatis
+        loadDataDariSheets();
     } catch (error) {
-        tuntasAlert("Gagal Simpan", "Koneksi ke Sheets bermasalah.", "error");
-    } finally {
+        alert("Gagal menyimpan data ke Sheets. Periksa koneksi internet atau konfigurasi Apps Script.");
         hideLoading();
     }
 }
 
-// Fungsi Tombol Logout
+// Fungsi Keluar Aplikasi
 function logoutAdmin() {
-    showLoading();
-    setTimeout(() => {
-        hideLoading();
-        alert("Logout Berhasil! Mengalihkan halaman...");
-        window.location.href = "https//sekawan.my.id"; // Arahkan ke halaman login milikmu
-    }, 800);
+    window.location.href = "login.html";
 }
 
-// Trigger inisialisasi awal saat halaman dibuka pertama kali
+// Trigger inisialisasi otomatis saat halaman pertama kali terbuka
 window.addEventListener('DOMContentLoaded', () => {
-    // Daftarkan aksi tutup modal alert
-    const btnOk = document.querySelector("#alertModal button");
-    if(btnOk) btnOk.setAttribute("onclick", "tutupAlert()");
-
-    // Set default tanggal hari ini pada form bayar
+    // Set default tanggal form iuran ke hari ini
     const tglInput = document.getElementById('iTgl');
-    if(tglInput) tglInput.valueToDate = new Date();
-
-    // Jalankan load data
+    if(tglInput) tglInput.value = new Date().toISOString().split('T')[0];
+    
+    // Jalankan penarikan data langsung
     loadDataDariSheets();
 });
