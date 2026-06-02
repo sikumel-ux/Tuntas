@@ -1,7 +1,7 @@
 // ==========================================
 // CONFIG: SILAKAN SESUAIKAN URL API WEB APP KAMU DI SINI
 // ==========================================
-const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyxxxxxxxxx/exec"; 
+const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwI8UM92CtLbTAE5F8UVjnm3qT-8ITco_-bPIQIjBfokGojFhYkRfl0YP9zCpVaRfTIpg/exec"; 
 
 // Fungsi Pengendali Tampilan Loading Screen
 function showLoading() {
