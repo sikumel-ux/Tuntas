@@ -1,17 +1,5 @@
-// URL REST API Google Apps Script & SDK Firebase Integration Engine
-const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbx9JsUb0saYvFnH8vpCn2JZu_AzdrXXXmQIcGfMW0dsTvPndFQC_CtKyLhMx_6Kjd_IEg/exec";
-
-const firebaseConfig = {
-    apiKey: "AIzaSyCzz0INhgBUARAxqLlMnCC8vyCciI9jpJk",
-    authDomain: "tuntas-04.firebaseapp.com",
-    databaseURL: "https://tuntas-04-default-rtdb.asia-southeast1.firebasedatabase.app",
-    projectId: "tuntas-04",
-    storageBucket: "tuntas-04.firebasestorage.app",
-    messagingSenderId: "509433415219",
-    appId: "1:509433415219:web:e485a0eab1a612fda64546"
-};
-if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
-const dbFirebase = firebase.database();
+// URL REST API Google Apps Script Integration Engine (Pure Google Sheets)
+const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzXYGTce8zbAVZ90miolenY1CN7XKHPqozLRecQHaLEJoeimFSbHXHVcfMVxlWAdP9R/exec";
 
 const daftarBulan = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
 let dbGlobal = { kas: [], pembayaran: [], anggota: [] };
@@ -72,7 +60,7 @@ function init() {
     reloadData();
 }
 
-// PERBAIKAN MUTLAK: Menggunakan URLSearchParams agar Parameter Action tidak Hilang/Kosong
+// Ambil data menggunakan URLSearchParams agar parameter aman lolos ke Google Apps Script
 function reloadData() {
     showLoading();
     
@@ -160,4 +148,166 @@ function renderDataTabel() {
         let tr = '<tr><td class="sticky-col p-3 border-b text-slate-700 uppercase font-black">' + w.nama + '</td>';
         daftarBulan.forEach(bln => {
             const lunas = dbGlobal.pembayaran.some(p => p.nama.toLowerCase() === w.nama.toLowerCase() && p.bulan === bln);
-            tr += '<td class="text-center border-b p-2"><span class="inline-block w-5 h-5 rounded-md ' + (lunas ? 'bg-emerald-50 text-emerald-700' : 'bg-slate-100 text-slate-30
+            tr += '<td class="text-center border-b p-2"><span class="inline-block w-5 h-5 rounded-md ' + (lunas ? 'bg-emerald-50 text-emerald-700' : 'bg-slate-100 text-slate-300') + ' font-black text-[10px] flex items-center justify-center mx-auto">' + (lunas ? '✓' : '—') + '</span></td>';
+        });
+        tr += '<td class="text-center border-b p-2"><button onclick="bukaDetailIuranWarga(\'' + w.nama + '\')" class="text-emerald-700 font-black text-[10px] hover:underline">LIHAT</button></td></tr>';
+        tbRekap.insertAdjacentHTML('beforeend', tr);
+    });
+
+    if(dbGlobal.anggota.length === 0) {
+        tbRekap.innerHTML = '<tr><td colspan="14" class="text-center p-4 text-slate-400 font-semibold">Data masih kosong.</td></tr>';
+    }
+}
+
+function postToSheets(fd, msg) {
+    showLoading();
+    fetch(SCRIPT_URL, { method: 'POST', body: fd })
+        .then(res => res.json())
+        .then(res => { 
+            hideLoading(); 
+            tuntasAlert("Berhasil", msg); 
+            reloadData(); 
+        })
+        .catch(() => { 
+            hideLoading(); 
+            tuntasAlert("Gagal", "Koneksi terputus dengan gerbang Spreadsheet", "error"); 
+        });
+}
+
+function simpanKas() {
+    const tgl = document.getElementById('kTgl').value;
+    const kat = document.getElementById('kKat').value;
+    const ket = document.getElementById('kKet').value.trim();
+    const nom = document.getElementById('kNom').value;
+    if(!tgl || !ket || !nom) return tuntasAlert("Error", "Isi semua form input kas!", "error");
+    
+    const fd = new FormData(); 
+    fd.append('action', 'insertKas'); 
+    fd.append('tanggal', tgl); 
+    fd.append('jenis', kat); 
+    fd.append('keterangan', ket); 
+    fd.append('jumlah', nom);
+    
+    closeModal('mKas'); 
+    postToSheets(fd, "Kas umum berhasil dicatat!");
+}
+
+function simpanAnggota() {
+    const name = document.getElementById('aNama').value.trim();
+    const hp = document.getElementById('aHp').value.trim();
+    if(!name || !hp) return tuntasAlert("Error", "Lengkapi data nama dan nomor WhatsApp!", "error");
+    
+    const fd = new FormData(); 
+    fd.append('action', 'insertAnggota'); 
+    fd.append('nama', name); 
+    fd.append('hp', hp);
+    
+    closeModal('mAnggota'); 
+    postToSheets(fd, "Data warga berhasil ditambahkan!");
+}
+
+function simpanIuran() {
+    const nama = document.getElementById('iNama').value;
+    const nominal = document.getElementById('iNom').value;
+    const tgl = document.getElementById('iTgl').value;
+    const bulan = Array.from(document.querySelectorAll('input[name="blnCek"]:checked')).map(c => c.value);
+    if(!nama || !nominal || bulan.length === 0) return tuntasAlert("Error", "Lengkapi nama warga, nominal, dan pilihan bulan!", "error");
+
+    const noRef = "T-" + Math.floor(100000 + Math.random() * 900000);
+    const fd = new FormData(); 
+    fd.append('action', 'insertPembayaran'); 
+    fd.append('tanggal', tgl); 
+    fd.append('nama', nama); 
+    fd.append('bulan', bulan.join(', ')); 
+    fd.append('jumlah', nominal); 
+    fd.append('referensi', noRef);
+
+    const target = dbGlobal.anggota.find(w => w.nama.toLowerCase() === nama.toLowerCase());
+    if(target && target.hp) {
+        const txt = "Halo, pak/bu *" + nama.toUpperCase() + "*..\nPembayaran Anda telah kami terima dengan no referensi *" + noRef + "*.\n\n---------------------------\nCek e-Kuitansi Anda di:\nhttps://domain.com/kuitansi.html?id=" + noRef + "\n---------------------------\n\nTerimakasih atas partisipasinya.\n\nPengurus TUNTAS,\n\n*APRIL*";
+        window.open("https://wa.me/" + target.hp + "?text=" + encodeURIComponent(txt), '_blank');
+    }
+    postToSheets(fd, "Iuran tercatat! No Ref: " + noRef);
+    document.querySelectorAll('input[name="blnCek"]').forEach(c => c.checked = false);
+    document.getElementById('iNom').value = "";
+}
+
+// PURE GOOGLE SHEETS: Fungsi laporan sampah diarahkan langsung ke Apps Script Spreadsheet
+function simpanLaporanSampah() {
+    const tgl = document.getElementById('sTgl').value;
+    const nama = document.getElementById('sNama').value;
+    const status = document.querySelector('input[name="sStatus"]:checked').value;
+    if(!tgl || !nama) return tuntasAlert("Error", "Lengkapi tanggal operasional dan nama warga!", "error");
+
+    const fd = new FormData();
+    fd.append('action', 'insertSampah');
+    fd.append('tanggal', tgl);
+    fd.append('nama', nama);
+    fd.append('status', status);
+    
+    postToSheets(fd, "Laporan Operasional Sampah berhasil dicatat di Spreadsheet!");
+}
+
+function hapusTrx(kelompok, id) {
+    tuntasConfirm("Hapus data ini secara permanen?", function() {
+        const fd = new FormData(); 
+        fd.append('action', 'deleteData'); 
+        fd.append('type', kelompok); 
+        fd.append('id', id);
+        postToSheets(fd, "Data berhasil dihapus dari server.");
+    });
+}
+
+function bukaDetailIuranWarga(namaWarga) {
+    document.getElementById('mdTitle').innerText = "Riwayat: " + namaWarga.toUpperCase();
+    const list = document.getElementById('mdList'); list.innerHTML = "";
+    const riwayat = dbGlobal.pembayaran.filter(p => p.nama.toLowerCase() === namaWarga.toLowerCase());
+    
+    if(riwayat.length > 0) {
+        riwayat.forEach(r => {
+            list.innerHTML += '<div class="p-2.5 bg-slate-50 rounded-xl flex justify-between items-center text-[11px] animate-fade-in">' +
+                '<div><p class="font-black text-emerald-900">Periode: ' + r.bulan + '</p><p class="text-[9px] text-slate-400 font-bold">' + r.tanggal + '</p></div>' +
+                '<div class="flex items-center gap-2"><span class="font-extrabold text-slate-700">' + formatRupiah(r.jumlah) + '</span>' +
+                '<button onclick="closeModal(\'mDetailIuran\'); hapusTrx(\'pembayaran\', \'' + r.id + '\')" class="text-slate-300 hover:text-red-500"><span class="material-symbols-rounded !text-sm">delete</span></button></div>' +
+            '</div>';
+        });
+    } else { 
+        list.innerHTML = "<p class='text-center text-slate-400 py-4 font-semibold'>Belum ada riwayat pembayaran.</p>"; 
+    }
+    openModal('mDetailIuran');
+}
+
+// Navigasi SPA dengan pembersihan display CSS (Menghilangkan Tumpukan Konten)
+function st(t) {
+    document.querySelectorAll('.tab-content').forEach(function(screen) {
+        screen.style.display = 'none'; 
+        screen.classList.remove('active');
+    });
+    
+    const targetScreen = document.getElementById('screen-' + t);
+    if (targetScreen) {
+        targetScreen.style.display = 'block'; 
+        targetScreen.classList.add('active');
+    }
+    
+    document.querySelectorAll('nav button').forEach(function(btn) {
+        btn.classList.remove('active');
+    });
+    
+    const targetBtn = document.getElementById('n-' + t);
+    if (targetBtn) {
+        targetBtn.classList.add('active');
+    }
+}
+
+function downloadPDF() {
+    tuntasAlert("Cetak Dokumen", "Fitur cetak PDF siap dihubungkan dengan data transaksi Anda.");
+}
+
+function logout() { 
+    tuntasConfirm("Keluar dari area sistem administrator?", function() { 
+        window.location.href = "index.html"; 
+    }); 
+}
+
+window.onload = init;
