@@ -17,40 +17,55 @@ body {
     font-variant-numeric: tabular-nums;
 }
 
-/* 2. Custom Scrollbar untuk List Riwayat Kas */
-#listKasContainer::-webkit-scrollbar {
-    width: 5px;
+/* 2. Structural Layout Components (Modal & Loading Overlay) */
+.modal { 
+    display: none; 
+    position: fixed; 
+    inset: 0; 
+    background: rgba(0, 0, 0, 0.4); 
+    z-index: 300; 
+    align-items: center; 
+    justify-content: center; 
+    padding: 20px; 
+    backdrop-filter: blur(4px); 
+    -webkit-backdrop-filter: blur(4px);
+    animation: fadeIn 0.2s ease-out;
 }
 
-#listKasContainer::-webkit-scrollbar-track {
-    background: #f1f5f9; /* slate-100 */
-    border-radius: 10px;
+.modal-content { 
+    background: white; 
+    padding: 24px; 
+    border-radius: 2rem; 
+    width: 100%; 
+    max-width: 400px; 
+    animation: popUp 0.2s cubic-bezier(0.34, 1.56, 0.64, 1); 
 }
 
-#listKasContainer::-webkit-scrollbar-thumb {
-    background: #cbd5e1; /* slate-300 */
-    border-radius: 10px;
+.loading-overlay { 
+    display: none; 
+    position: fixed; 
+    inset: 0; 
+    background: rgba(255, 255, 255, 0.85); 
+    z-index: 200; 
+    align-items: center; 
+    justify-content: center; 
+    font-weight: bold; 
+    color: #064e3b; 
+    backdrop-filter: blur(4px); 
+    -webkit-backdrop-filter: blur(4px);
 }
 
-#listKasContainer::-webkit-scrollbar-thumb:hover {
-    background: #94a3b8; /* slate-400 */
-}
-
-/* 3. Efek Premium Glassmorphism & Figma Shadows */
-.glass-card {
-    background: rgba(255, 255, 255, 0.85);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
-    border: 1px solid rgba(255, 255, 255, 0.6);
-}
-
-.figma-shadow {
-    box-shadow: 0px 4px 30px rgba(0, 0, 0, 0.03), 
-                0px 1px 3px rgba(0, 0, 0, 0.02);
-}
-
-/* 4. Form Utilities & Focus State */
+/* 3. Form Utilities & Focus State */
 .modern-in {
+    width: 100%; 
+    padding: 14px; 
+    background: #f1f5f9; 
+    border: 1px solid #e2e8f0; 
+    border-radius: 1rem; 
+    outline: none; 
+    font-size: 13px; 
+    font-weight: 600; 
+    color: #1e293b;
     transition: all 0.2s ease-in-out;
 }
 
@@ -69,10 +84,42 @@ select.modern-in {
     padding-right: 40px;
 }
 
-/* 5. Custom Smooth Layer Animations */
+/* 4. Custom Scrollbar untuk List Riwayat Kas */
+#listKasContainer::-webkit-scrollbar {
+    width: 5px;
+}
+
+#listKasContainer::-webkit-scrollbar-track {
+    background: #f1f5f9; 
+    border-radius: 10px;
+}
+
+#listKasContainer::-webkit-scrollbar-thumb {
+    background: #cbd5e1; 
+    border-radius: 10px;
+}
+
+#listKasContainer::-webkit-scrollbar-thumb:hover {
+    background: #94a3b8; 
+}
+
+/* 5. Efek Premium Glassmorphism & Figma Shadows */
+.glass-card {
+    background: rgba(255, 255, 255, 0.85);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.6);
+}
+
+.figma-shadow {
+    box-shadow: 0px 4px 30px rgba(0, 0, 0, 0.03), 
+                0px 1px 3px rgba(0, 0, 0, 0.02);
+}
+
+/* 6. Custom Smooth Layer Animations */
 @keyframes popUp {
     from { 
-        transform: scale(0.96); 
+        transform: scale(0.95); 
         opacity: 0; 
     }
     to { 
@@ -86,15 +133,8 @@ select.modern-in {
     to { opacity: 1; }
 }
 
-/* 6. Optimasi Khusus Perangkat Mobile (PWA Standalone) */
-@media (display-mode: standalone) {
-    body {
-        padding-top: env(safe-area-inset-top);
-        padding-bottom: env(safe-area-inset-bottom);
-    }
-}
-
-/* Sentuhan interaksi tombol saat ditekan */
+/* Optimasi Khusus Perangkat Mobile */
 button:active {
     transform: scale(0.98);
+    transition: transform 0.1s ease;
 }
