@@ -4,26 +4,15 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>TUNTAS - Admin Panel</title>
+    <!-- CSS External Pendukung -->
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <style>
-        body { font-family: 'Space Grotesk', sans-serif; background-color: #0b0f19; color: #f8fafc; }
-        .glass { background: rgba(15, 23, 42, 0.6); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.05); }
-        .glass-btn { background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.05); transition: all 0.2s; }
-        .glass-btn:hover { background: rgba(255, 255, 255, 0.08); border-color: rgba(255, 255, 255, 0.1); }
-        .glass-btn.active { background: #3b82f6; border-color: #3b82f6; box-shadow: 0 0 15px rgba(59, 130, 246, 0.4); }
-        .modern-in { background: rgba(15, 23, 42, 0.8); border: 1px solid rgba(255, 255, 255, 0.08); padding: 0.75rem; border-radius: 0.75rem; color: #fff; width: 100%; font-size: 0.875rem; transition: all 0.2s; }
-        .modern-in:focus { outline: none; border-color: #3b82f6; box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2); }
-        .shd-b { box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.4); }
-        ::-webkit-scrollbar { width: 4px; height: 4px; }
-        ::-webkit-scrollbar-track { background: rgba(0,0,0,0.1); }
-        ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 2px; }
-        .screen { display: none; }
-        .screen.active { display: block; }
-    </style>
+    
+    <!-- MENGGUNAKAN STYLE.CSS YANG SUDAH KITA PUNYA -->
+    <link rel="stylesheet" href="style.css">
 </head>
 <body class="bg-[#070a13] min-h-screen pb-24 select-none">
 
@@ -31,7 +20,7 @@
     <header class="sticky top-0 z-40 glass border-b border-white/5 px-4 py-3 flex items-center justify-between shd-b">
         <!-- HEADER KIRI: Menggunakan logo.png agar serasi dengan Halaman User -->
         <div class="flex items-center gap-2">
-            <img src="logo.png" alt="Logo Tuntas" class="h-8 w-auto object-contain" onerror="this.onerror=null; this.insertAdjacentHTML('afterend', '<span class=\'text-lg font-bold bg-gradient-to-r from-blue-400 to-indigo-400 bg-clip-text text-transparent\'>TUNTAS</span>'); this.remove();">
+            <img src="logo.png" alt="Logo Tuntas" class="h-8 w-auto object-contain" onerror="this.onerror=null; this.insertAdjacentHTML('afterend', '<span class=\'text-lg font-bold text-white\'>TUNTAS</span>'); this.remove();">
         </div>
         
         <!-- HEADER KANAN: Tombol Akses Cepat Reload & Logout Berbasis Ikon -->
@@ -51,10 +40,6 @@
     <div id="loading" class="fixed inset-0 z-50 bg-[#070a13]/95 flex flex-col items-center justify-center gap-4 transition-all duration-300">
         <div class="w-12 h-12 border-4 border-blue-500/20 border-t-blue-500 rounded-full animate-spin"></div>
         <p class="text-xs text-slate-400 font-medium tracking-wider uppercase">Menghubungkan Ke Sheets...</p>
-        <!-- Tombol darurat jika koneksi script macet -->
-        <button onclick="paksaBukaAdmin()" class="mt-4 px-3 py-1.5 bg-white/5 border border-white/10 hover:bg-white/10 text-[10px] text-slate-400 rounded-lg uppercase tracking-widest transition-all">
-            Buka Paksa Panel
-        </button>
     </div>
 
     <!-- AREA KONTEN UTAMA -->
@@ -64,12 +49,10 @@
         <section id="scr-kas" class="screen active space-y-4">
             <div class="grid grid-cols-2 gap-3">
                 <div class="glass rounded-xl p-4 relative overflow-hidden">
-                    <div class="absolute -right-2 -bottom-2 text-blue-500/5 text-6xl font-bold"><i class="fa-solid fa-wallet"></i></div>
                     <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Total Saldo Kas</p>
                     <p id="vTotalKas" class="text-xl font-bold mt-1 text-blue-400">Rp 0</p>
                 </div>
                 <div class="glass rounded-xl p-4 relative overflow-hidden">
-                    <div class="absolute -right-2 -bottom-2 text-indigo-500/5 text-6xl font-bold"><i class="fa-solid fa-users"></i></div>
                     <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Total Warga</p>
                     <p id="vTotalWarga" class="text-xl font-bold mt-1 text-indigo-400">0</p>
                 </div>
@@ -88,7 +71,7 @@
         <section id="scr-warga" class="screen space-y-4">
             <div class="glass rounded-xl p-3 flex items-center gap-2">
                 <i class="fa-solid fa-magnifying-glass text-slate-400 ml-1"></i>
-                <input type="text" id="cariWarga" placeholder="CARI NAMA WARGA..." class="bg-transparent text-sm w-full focus:outline-none uppercase font-medium">
+                <input type="text" id="cariWarga" placeholder="CARI NAMA WARGA..." class="bg-transparent text-sm w-full focus:outline-none uppercase font-medium text-white">
             </div>
             <div id="listWarga" class="space-y-2 max-h-[450px] overflow-y-auto pr-1"></div>
         </section>
@@ -170,48 +153,33 @@
         </div>
     </div>
 
-    <!-- EMBED LOGIKA SISTEM UTAMA -->
+    <!-- ENGINE UTAMA -->
     <script src="script.js"></script>
     <script>
-        // FUNGSI ANTI-STUCK (SAFETY CATCHER)
-        // Jika dalam 4 detik data sheet gagal di-load script.js, layar gelap dihancurkan otomatis!
-        setTimeout(() => {
-            const loader = document.getElementById('loading');
-            if (loader && loader.style.display !== 'none') {
-                console.warn("Sistem mendeteksi script.js kamu stuck. Melakukan bypass layar gelap...");
-                paksaBukaAdmin();
-            }
-        }, 4000);
-
-        function paksaBukaAdmin() {
-            const loader = document.getElementById('loading');
-            if(loader) loader.style.setProperty('display', 'none', 'important');
-        }
-
+        // Fungsi pemicu kontrol loading screen terintegrasi dengan script.js kamu
         function hideLoading() { 
-            paksaBukaAdmin(); 
+            const loader = document.getElementById('loading');
+            if(loader) loader.style.display = 'none';
         }
-
         function showLoading() {
             const loader = document.getElementById('loading');
             if(loader) loader.style.display = 'flex';
         }
 
-        // NAVIGASI INTERFACES
+        // Navigasi Tab menu bawah
         function pindahScreen(target) {
-            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+            document.querySelectorAll('.screen').forEach(s => s.style.display = 'none');
             document.querySelectorAll('nav button').forEach(b => b.classList.remove('active'));
             
             const scr = document.getElementById('scr-' + target);
             const btn = document.getElementById('btn-' + target);
-            if(scr) scr.classList.add('active');
+            if(scr) scr.style.display = 'block';
             if(btn) btn.classList.add('active');
         }
 
         function tutupAlert() {
             document.getElementById('alertModal').classList.replace('flex', 'hidden');
         }
-
         function tuntasAlert(title, msg, type="success") {
             const m = document.getElementById('alertModal');
             const ico = document.getElementById('alertIcon');
