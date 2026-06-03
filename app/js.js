@@ -2,10 +2,16 @@
  * TUNTAS FRONTEND ENGINE - CLIENT SIDE (script.js)
  */
 
-// URL Gas andalan dikunci mati sesuai request
-const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbx9F6sG4TZNJRI1BNiYGAAYb_38dG6ewbmDIoR-brYonJlA9ivCqhKCln1UxT16-NNN/exec";
+// URL Gas paten dan aktif milikmu
+const SCRIPT_URL = "https://script.google.com/macros/s/AKfycb9F6sG4TZNJRI1BNiYGAAYb_38dG6ewbmDIoR-brYonJlA9ivCqhKCln1UxT16-NNN/exec";
 
-// Variabel Global penampung data database
+// Simulasi Identitas Warga Aktif (Nanti disesuaikan dengan mekanisme Login/LocalStorage milikmu)
+window.wargaAktif = {
+    hp: "081234567890", // Ganti dengan HP dummy warga untuk tes awal
+    nama: "Haidar Abicandra"
+};
+
+// Wadah Penampung Data Global
 window.dataTuntas = {
     anggota: [],
     kas: [],
@@ -14,165 +20,209 @@ window.dataTuntas = {
 };
 
 /**
- * A. FUNGSI MUAT UTAMA: AMBIL DATA DARI DB GOOGLE SHEETS
+ * 1. AMBIL DATA DARI GOOGLE SHEETS
  */
 async function muatDatabaseTuntas() {
-    console.log("Menghubungi database Google Sheets...");
+    console.log("Menghubungi database TUNTAS...");
     try {
-        // Ambil data menggunakan gabungan string manual agar bebas dari salah ketik backtick
         const respon = await fetch(SCRIPT_URL + "?action=readAllData");
-        
-        if (!respon.ok) throw new Error("Respon jaringan internet tidak stabil.");
+        if (!respon.ok) throw new Error("Koneksi jaringan bermasalah.");
         
         const json = await respon.json();
-
         if (json.status === "success") {
-            console.log("Koneksi Sukses! Data berhasil dimuat.", json.data);
             window.dataTuntas = json.data;
+            console.log("Data Berhasil Disinkronkan:", window.dataTuntas);
             
-            // Eksekusi fungsi render UI kamu di bawah ini jika ada (misal renderDashboard())
+            // Jalankan Render UI
+            renderProfilWarga();
+            renderRingkasanKas();
+            renderHistoriKasWarga();
+            renderStatusIuranWarga();
         } else {
-            console.error("Eror Server GAS:", json.message);
-            tuntasAlert("Eror Database", "Gagal menghubungi database Google Sheets.", "error");
+            throw new Error(json.message);
         }
-    } catch (eror) {
-        console.error("Gagal Fetching:", eror);
-        tuntasAlert("Koneksi Gagal", "Gagal menghubungi database Google Sheets. Periksa koneksi internet Anda.", "error");
+    } catch (error) {
+        console.error("Gagal Memuat Data:", error);
+        tuntasAlert("Koneksi Gagal", "Gagal menyinkronkan data dengan Google Sheets.", "error");
     }
 }
 
 /**
- * B. FUNGSI UPLOAD FOTO PROFIL WARGA (Bebas Limit Size MB - Kompresi Otomatis Canvas)
+ * 2. RENDER PROFIL & DATA WARGA
  */
-async function uploadFotoProfilWarga(noHpWarga, fileGambar) {
-    if (!fileGambar) {
-        tuntasAlert("Peringatan", "Silakan pilih file foto terlebih dahulu!", "warning");
+function renderProfilWarga() {
+    const dataWarga = window.dataTuntas.anggota.find(w => w.HP.toString().trim() === window.wargaAktif.hp) || 
+                      { Nama: window.wargaAktif.nama, HP: window.wargaAktif.hp, Foto: "" };
+    
+    document.getElementById("namaWarga").innerText = dataWarga.Nama;
+    document.getElementById("hpWarga").innerText = dataWarga.HP;
+    if (dataWarga.Foto && dataWarga.Foto.trim() !== "") {
+        document.getElementById("avatarWarga").src = dataWarga.Foto;
+    }
+
+    // Ambil status sampah warga
+    const dataSampah = window.dataTuntas.sampah.find(s => s.HP.toString().trim() === window.wargaAktif.hp);
+    document.getElementById("statusSampahWarga").innerText = dataSampah ? dataSampah.Status : "Aktif";
+}
+
+/**
+ * 3. RENDER RINGKASAN & HISTORI KAS UTAMA
+ */
+function renderRingkasanKas() {
+    let totalMasuk = 0;
+    let totalKeluar = 0;
+
+    window.dataTuntas.kas.forEach(item => {
+        const nominal = parseFloat(item.Nominal) || 0;
+        if (item.Kategori.toLowerCase().trim() === "pemasukan") {
+            totalMasuk += nominal;
+        } else if (item.Kategori.toLowerCase().trim() === "pengeluaran") {
+            totalKeluar += nominal;
+        }
+    });
+
+    const saldoAkhir = totalMasuk - totalKeluar;
+
+    document.getElementById("saldoKasTotal").innerText = formatRupiah(saldoAkhir);
+    document.getElementById("kasMasukTotal").innerText = formatRupiah(totalMasuk);
+    document.getElementById("kasKeluarTotal").innerText = formatRupiah(totalKeluar);
+}
+
+function renderHistoriKasWarga() {
+    const container = document.getElementById("listKasAnggota");
+    container.innerHTML = "";
+
+    // Ambil 5 transaksi teratas/terbaru
+    const cetakKas = window.dataTuntas.kas.slice(-5).reverse();
+
+    if (cetakKas.length === 0) {
+        container.innerHTML = `<p class="text-xs text-slate-500 text-center py-4">Belum ada catatan transaksi.</p>`;
         return;
     }
 
-    tuntasAlert("Memproses", "Sedang mengompresi dan mengunggah foto...", "info");
+    cetakKas.forEach(item => {
+        const isMasuk = item.Kategori.toLowerCase().trim() === "pemasukan";
+        const div = document.createElement("div");
+        div.className = "flex justify-between items-center p-2.5 rounded-xl bg-slate-800/80 border border-slate-700/40 text-xs";
+        div.innerHTML = `
+            <div>
+                <p class="font-bold text-slate-200">${item.Keterangan}</p>
+                <p class="text-[10px] text-slate-500">${item.Tanggal}</p>
+            </div>
+            <span class="font-bold ${isMasuk ? 'text-emerald-400' : 'text-rose-400'}">
+                ${isMasuk ? '+' : '-'} ${formatRupiah(item.Nominal)}
+            </span>
+        `;
+        container.appendChild(div);
+    });
+}
+
+/**
+ * 4. RENDER BLOK TABEL IURAN BULANAN WARGA
+ */
+function renderStatusIuranWarga() {
+    const container = document.getElementById("gridIuranAnggota");
+    container.innerHTML = "";
+
+    const dataIuran = window.dataTuntas.pembayaran.find(p => p.HP.toString().trim() === window.wargaAktif.hp);
+    const daftarBulan = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
+    
+    let lunasCount = 0;
+
+    daftarBulan.forEach(bulan => {
+        const status = dataIuran && dataIuran[bulan] ? dataIuran[bulan].toString().toUpperCase().trim() : "BELUM BAYAR";
+        const isLunas = status === "LUNAS";
+        if (isLunas) lunasCount++;
+
+        const div = document.createElement("div");
+        div.className = `p-2 rounded-xl border font-semibold ${isLunas ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20' : 'bg-slate-800/50 text-slate-500 border-slate-700/50'}`;
+        div.innerHTML = `
+            <p class="text-[10px] uppercase opacity-70">${bulan.substring(0, 3)}</p>
+            <p class="text-[9px] mt-0.5">${status}</p>
+        `;
+        container.appendChild(div);
+    });
+
+    document.getElementById("totalIuranWarga").innerText = `${lunasCount} Bulan`;
+}
+
+/**
+ * 5. UPLOAD FOTO PROFIL (ANTI RESOLUSI LIMIT VIA CANVAS COMPRESSION)
+ */
+async function handleGantiFoto(input) {
+    const file = input.files[0];
+    if (!file) return;
+
+    Swal.fire({
+        title: "Unggah Foto Profil",
+        text: "Sedang memproses dan mengompresi gambar...",
+        allowOutsideClick: false,
+        didOpen: () => { Swal.showLoading(); }
+    });
 
     try {
-        // Kompresi di sisi browser agar file megabyte besar menciut jadi ratusan KB murni JPEG
-        const base64Data = await kompresiGambarKeBase64(fileGambar, 800, 0.8);
+        // Kompresi di client side, paksa maksimal lebar 800px untuk menghemat bandwidth
+        const base64Data = await kompresiCanvasKeBase64(file, 800, 0.75);
 
         const queryParams = new URLSearchParams({
             action: "updateProfilWarga",
-            hp: noHpWarga,
-            filename: "FOTO_" + noHpWarga + "_" + Date.now() + ".jpg",
+            hp: window.wargaAktif.hp,
+            filename: `FOTO_${window.wargaAktif.hp}.jpg`,
             mimetype: "image/jpeg"
         });
 
-        // Kirim request POST dengan body string base64 murni
-        const respon = await fetch(SCRIPT_URL + "?" + queryParams.toString(), {
+        const respon = await fetch(`${SCRIPT_URL}?${queryParams.toString()}`, {
             method: "POST",
             mode: "cors",
             body: base64Data
         });
 
         const hasil = await respon.json();
-
         if (hasil.status === "success") {
-            tuntasAlert("Sukses", "Foto profil berhasil diperbarui!", "success");
-            
-            // Perbarui session local warga yang login jika ada
-            let sessionWarga = JSON.parse(localStorage.getItem("wargaLogin"));
-            if (sessionWarga) {
-                sessionWarga.Foto = hasil.newFotoUrl;
-                sessionWarga.foto = hasil.newFotoUrl;
-                localStorage.setItem("wargaLogin", JSON.stringify(sessionWarga));
-            }
-            
-            muatDatabaseTuntas(); // Ambil ulang data segar dari Sheets
-            return hasil.newFotoUrl;
+            document.getElementById("avatarWarga").src = hasil.newFotoUrl;
+            Swal.fire("Berhasil", "Foto profil kamu sukses diperbarui!", "success");
+            muatDatabaseTuntas();
         } else {
             throw new Error(hasil.message);
         }
-    } catch (error) {
-        console.error("Gagal Upload Foto:", error);
-        tuntasAlert("Upload Gagal", "Gagal menyimpan foto: " + error.message, "error");
+    } catch (err) {
+        console.error(err);
+        Swal.fire("Gagal", "Gagal mengunggah foto: " + err.message, "error");
     }
 }
 
 /**
- * C. FUNGSI UPDATE PASSWORD KATA SANDI WARGA
+ * UTILITY / HELPER ENGINE
  */
-async function updatePasswordWarga(noHpWarga, passwordBaru) {
-    if (!passwordBaru || passwordBaru.trim() === "") {
-        tuntasAlert("Peringatan", "Password baru tidak boleh kosong!", "warning");
-        return;
-    }
-
-    tuntasAlert("Memproses", "Menyimpan password baru...", "info");
-
-    try {
-        const queryParams = new URLSearchParams({
-            action: "updateProfilWarga",
-            hp: noHpWarga,
-            passwordBaru: passwordBaru.trim()
-        });
-
-        const respon = await fetch(SCRIPT_URL + "?" + queryParams.toString(), {
-            method: "POST",
-            mode: "cors"
-        });
-
-        const hasil = await respon.json();
-
-        if (hasil.status === "success") {
-            tuntasAlert("Sukses", "Password berhasil diubah!", "success");
-            muatDatabaseTuntas(); // Sinkronisasi ulang database
-        } else {
-            throw new Error(hasil.message);
-        }
-    } catch (error) {
-        console.error("Gagal Update Password:", error);
-        tuntasAlert("Gagal", "Gagal memperbarui password: " + error.message, "error");
-    }
-}
-
-/**
- * HELPER INTERNAL UTILITY
- */
-function kompresiGambarKeBase64(file, maxWidth = 800, quality = 0.8) {
+function kompresiCanvasKeBase64(file, maxWidth, quality) {
     return new Promise((resolve, reject) => {
         const reader = new FileReader();
         reader.readAsDataURL(file);
-        reader.onload = (event) => {
+        reader.onload = (e) => {
             const img = new Image();
-            img.src = event.target.result;
+            img.src = e.target.result;
             img.onload = () => {
                 const canvas = document.createElement("canvas");
-                let width = img.width;
-                let height = img.height;
-
-                if (width > maxWidth) {
-                    height = Math.round((height * maxWidth) / width);
-                    width = maxWidth;
-                }
-                canvas.width = width;
-                canvas.height = height;
-
+                let w = img.width;
+                let h = img.height;
+                if (w > maxWidth) { h = Math.round((h * maxWidth) / w); w = maxWidth; }
+                canvas.width = w; canvas.height = h;
                 const ctx = canvas.getContext("2d");
-                ctx.drawImage(img, 0, 0, width, height);
-
-                const dataUrl = canvas.toDataURL("image/jpeg", quality);
-                resolve(dataUrl);
+                ctx.drawImage(img, 0, 0, w, h);
+                resolve(canvas.toDataURL("image/jpeg", quality));
             };
-            img.onloadend = () => {};
-            img.onerror = (err) => reject(err);
+            img.onerror = reject;
         };
-        reader.onerror = (err) => reject(err);
+        reader.onerror = reject;
     });
 }
 
-function tuntasAlert(judul, pesan, tipe) {
-    if (typeof Swal !== "undefined") {
-        Swal.fire(judul, pesan, tipe);
-    } else {
-        alert("[" + judul + "] \n" + pesan);
-    }
+function formatRupiah(angka) {
+    return "Rp " + parseFloat(angka).toLocaleString("id-ID");
 }
 
-// Triger jalankan penarikan database otomatis saat web dimuat
+function tuntasAlert(judul, pesan, tipe) {
+    if (typeof Swal !== "undefined") { Swal.fire(judul, pesan, tipe); } else { alert(`[${judul}] \n${pesan}`); }
+}
+
 document.addEventListener("DOMContentLoaded", muatDatabaseTuntas);
