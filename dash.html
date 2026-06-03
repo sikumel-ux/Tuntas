@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>TUNTAS - Dashboard Admin</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="bg-slate-50 font-['Plus_Jakarta_Sans'] text-slate-800 antialiased">
+
+    <div id="loading" class="fixed inset-0 bg-slate-950/20 backdrop-blur-md z-[9999] flex flex-col items-center justify-center gap-3 hidden">
+        <div class="w-10 h-10 border-4 border-emerald-100 border-t-emerald-800 rounded-full animate-spin"></div>
+        <p class="text-[10px] font-black text-emerald-900 uppercase tracking-widest bg-white/80 px-4 py-2 rounded-full border border-slate-100 shadow-sm">Sinkronisasi Database...</p>
+    </div>
+
+    <div class="max-w-md mx-auto min-h-screen bg-slate-50 flex flex-col pb-24 relative shadow-2xl shadow-slate-200">
+        
+        <header class="p-6 bg-white border-b border-slate-100 sticky top-0 z-40 flex justify-between items-center">
+            <div>
+                <h1 class="text-xl font-black text-emerald-900 tracking-tighter leading-none">TUNTAS.</h1>
+                <p class="text-[8px] font-bold text-slate-400 uppercase tracking-widest mt-1">RT 04 Dongkelan, Bantul</p>
+            </div>
+            <button onclick="logout()" class="w-9 h-9 rounded-2xl bg-rose-50 text-rose-600 flex items-center justify-center hover:bg-rose-100 transition-all">
+                <span class="material-symbols-rounded !text-md">logout</span>
+            </button>
+        </header>
+
+        <main id="screen-kas" class="tab-content p-4 space-y-4">
+            <div class="p-5 bg-white border border-slate-100 rounded-[2rem] shadow-sm space-y-4">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-[9px] font-black text-slate-400 uppercase tracking-wider">Saldo Utama Kas</p>
+                        <h2 id="saldoSelamanya" class="text-2xl font-black text-emerald-900 tracking-tight mt-0.5">Rp 0</h2>
+                    </div>
+                    <button onclick="openModal('mKas')" class="py-2.5 px-4 bg-emerald-900 text-white rounded-xl text-[10px] font-black uppercase flex items-center gap-1 shadow-md shadow-emerald-900/10 hover:bg-emerald-950 transition-all">
+                        <span class="material-symbols-rounded !text-xs">add</span> Catat Kas
+                    </button>
+                </div>
+                
+                <div class="grid grid-cols-2 gap-2 pt-2 border-t border-slate-50">
+                    <div class="p-3 bg-slate-50/50 rounded-2xl border border-slate-100">
+                        <p class="text-[8px] font-bold text-slate-400 uppercase">Periode Masuk</p>
+                        <p id="totalMasuk" class="text-xs font-black text-emerald-600 mt-0.5">Rp 0</p>
+                    </div>
+                    <div class="p-3 bg-slate-50/50 rounded-2xl border border-slate-100">
+                        <p class="text-[8px] font-bold text-slate-400 uppercase">Periode Keluar</p>
+                        <p id="totalKeluar" class="text-xs font-black text-red-500 mt-0.5">Rp 0</p>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-2 gap-2 pt-2 text-[10px] font-bold text-slate-500">
+                    <div>
+                        <label class="block text-[8px] uppercase tracking-wider mb-1 text-slate-400">Mulai</label>
+                        <input type="date" id="fMulai" onchange="renderDataTabel()" class="w-full p-2.5 bg-slate-50 border border-slate-100 rounded-xl font-bold text-slate-700 outline-none">
+                    </div>
+                    <div>
+                        <label class="block text-[8px] uppercase tracking-wider mb-1 text-slate-400">Selesai</label>
+                        <input type="date" id="fSelesai" onchange="renderDataTabel()" class="w-full p-2.5 bg-slate-50 border border-slate-100 rounded-xl font-bold text-slate-700 outline-none">
+                    </div>
+                </div>
+            </div>
+
+            <div class="space-y-2">
+                <div class="flex justify-between items-center px-1">
+                    <h3 class="text-[10px] font-black text-slate-400 uppercase tracking-wider">Arus Kas Terfilter (<span id="totalSaldo" class="text-slate-600">Rp 0</span>)</h3>
+                    <button onclick="downloadPDF()" class="text-[10px] font-black text-emerald-800 uppercase hover:underline flex items-center gap-0.5"><span class="material-symbols-rounded !text-xs">print</span> Cetak</button>
+                </div>
+                <div id="listRiwayat" class="space-y-2">
+                    </div>
+            </div>
+        </main>
+
+        <main id="screen-warga" class="tab-content p-4 space-y-4" style="display: none;">
+            <div class="flex justify-between items-center px-1">
+                <h3 class="text-[10px] font-black text-slate-400 uppercase tracking-wider">Daftar Anggota Warga</h3>
+                <button onclick="openModal('mAnggota')" class="py-2 px-3 bg-emerald-900 text-white rounded-xl text-[9px] font-black uppercase flex items-center gap-0.5 shadow-md hover:bg-emerald-950 transition-all">
+                    <span class="material-symbols-rounded !text-xs">person_add</span> Tambah Warga
+                </button>
+            </div>
+            
+            <div id="tBodyWarga" class="space-y-2">
+                </div>
+        </main>
+
+        <main id="screen-iuran" class="tab-content p-4 space-y-4" style="display: none;">
+            <div class="p-5 bg-white border border-slate-100 rounded-[2rem] shadow-sm space-y-4">
+                <h3 class="text-[11px] font-black text-slate-800 uppercase tracking-tight border-b border-slate-50 pb-2">Input Pembayaran Iuran</h3>
+                
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="text-[8px] font-black text-slate-400 uppercase block mb-1">Pilih Warga</label>
+                        <select id="iNama" class="w-full p-3 bg-slate-50 border border-slate-100 rounded-xl text-[10px] font-black text-slate-700 outline-none focus:border-emerald-800 transition-all">
+                            <option value="">PILIH WARGA</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="text-[8px] font-black text-slate-400 uppercase block mb-1">Tanggal Bayar</label>
+                        <input type="date" id="iTgl" class="w-full p-2.5 bg-slate-50 border border-slate-100 rounded-xl text-[10px] font-bold text-slate-700 outline-none">
+                    </div>
+                </div>
+
+                <div>
+                    <label class="text-[8px] font-black text-slate-400 uppercase block mb-1">Nominal Iuran (Rp)</label>
+                    <input type="number" id="iNom" placeholder="Contoh: 20000" class="w-full p-3 bg-slate-50 border border-slate-100 rounded-xl text-xs font-bold text-slate-700 outline-none focus:border-emerald-800 transition-all">
+                </div>
+
+                <div>
+                    <label class="text-[8px] font-black text-slate-400 uppercase block mb-2">Pilih Bulan Pembayaran</label>
+                    <div id="gridBulan" class="grid grid-cols-4 gap-1.5">
+                        </div>
+                </div>
+
+                <button onclick="simpanIuran()" class="w-full py-3.5 bg-emerald-900 text-white rounded-2xl text-xs font-black uppercase tracking-wider shadow-md hover:bg-emerald-950 transition-all mt-2">
+                    Simpan & Kirim Kuitansi WA
+                </button>
+            </div>
+
+            <div class="space-y-2">
+                <h3 class="text-[10px] font-black text-slate-400 uppercase tracking-wider px-1">Matriks Monitoring Rekap Iuran</h3>
+                <div class="bg-white border border-slate-100 rounded-3xl overflow-hidden shadow-sm overflow-x-auto custom-scroll">
+                    <table class="w-full text-left text-[10px] border-collapse min-w-[700px]">
+                        <thead>
+                            <tr id="th-rekap" class="bg-slate-50/50 text-slate-400 uppercase text-center border-b border-slate-100">
+                                </tr>
+                        </thead>
+                        <tbody id="tb-rekap" class="divide-y divide-slate-50 text-slate-600">
+                            </tbody>
+                    </table>
+                </div>
+            </div>
+        </main>
+
+        <main id="screen-sampah" class="tab-content p-4 space-y-4" style="display: none;">
+            <div class="p-5 bg-white border border-slate-100 rounded-[2rem] shadow-sm space-y-4">
+                <h3 class="text-[11px] font-black text-slate-800 uppercase tracking-tight border-b border-slate-50 pb-2">Log Operasional Truk Sampah</h3>
+                
+                <div>
+                    <label class="text-[8px] font-black text-slate-400 uppercase block mb-1">Tanggal Pengambilan</label>
+                    <input type="date" id="sTgl" class="w-full p-2.5 bg-slate-50 border border-slate-100 rounded-xl text-[10px] font-bold text-slate-700 outline-none">
+                </div>
+
+                <div>
+                    <label class="text-[8px] font-black text-slate-400 uppercase block mb-1">Petugas/Warga Penanggung Jawab</label>
+                    <select id="sNama" class="w-full p-3 bg-slate-50 border border-slate-100 rounded-xl text-[10px] font-black text-slate-700 outline-none focus:border-emerald-800 transition-all">
+                        <option value="">PILIH WARGA</option>
+                    </select>
+                </div>
+
+                <div>
+                    <label class="text-[8px] font-black text-slate-400 uppercase block mb-2">Status Pengangkutan</label>
+                    <div class="grid grid-cols-2 gap-2">
+                        <label class="relative block">
+                            <input type="radio" name="sStatus" value="Diambil" checked class="hidden peer">
+                            <div class="cursor-pointer text-xs font-bold p-3 text-center border border-slate-100 rounded-xl bg-white text-slate-400 peer-checked:bg-emerald-50 peer-checked:border-emerald-200 peer-checked:text-emerald-900 transition-all">DIAMBIL</div>
+                        </label>
+                        <label class="relative block">
+                            <input type="radio" name="sStatus" value="Terlewat" class="hidden peer">
+                            <div class="cursor-pointer text-xs font-bold p-3 text-center border border-slate-100 rounded-xl bg-white text-slate-400 peer-checked:bg-red-50 peer-checked:border-red-200 peer-checked:text-red-600 transition-all">TERLEWAT</div>
+                        </label>
+                    </div>
+                </div>
+
+                <button onclick="simpanLaporanSampah()" class="w-full py-3.5 bg-emerald-900 text-white rounded-2xl text-xs font-black uppercase tracking-wider shadow-md hover:bg-emerald-950 transition-all mt-2">
+                    Catat Laporan Sampah
+                </button>
+            </div>
+        </main>
+
+        <div id="mKas" class="modal-back">
+            <div class="modal-card p-6 bg-white rounded-[2.5rem] max-w-sm w-full mx-4 border border-slate-100">
+                <h3 class="text-sm font-black text-slate-800 uppercase tracking-tight mb-4">Catat Transaksi Kas</h3>
+                <div class="space-y-4 text-left">
+                    <div>
+                        <label class="text-[8px] font-black text-slate-400 uppercase block mb-1">Tanggal</label>
+                        <input type="date" id="kTgl" class="w-full p-2.5 bg-slate-50 border border-slate-100 rounded-xl text-[10px] font-bold text-slate-700 outline-none">
+                    </div>
+                    <div>
+                        <label class="text-[8px] font-black text-slate-400 uppercase block mb-1">Jenis Arus</label>
+                        <select id="kKat" class="w-full p-3 bg-slate-50 border border-slate-100 rounded-xl text-[10px] font-black text-slate-700 outline-none">
+                            <option value="Masuk">KAS MASUK (+)</option>
+                            <option value="Keluar">KAS KELUAR (-)</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="text-[8px] font-black text-slate-400 uppercase block mb-1">Keterangan Alokasi</label>
+                        <input type="text" id="kKet" placeholder="Contoh: Beli sapu lidi pos ronda" class="w-full p-3 bg-slate-50 border border-slate-100 rounded-xl text-xs font-bold text-slate-700 outline-none focus:border-emerald-800">
+                    </div>
+                    <div>
+                        <label class="text-[8px] font-black text-slate-400 uppercase block mb-1">Nominal (Rp)</label>
+                        <input type="number" id="kNom" placeholder="Contoh: 150000" class="w-full p-3 bg-slate-50 border border-slate-100 rounded-xl text-xs font-bold text-slate-700 outline-none focus:border-emerald-800">
+                    </div>
+                </div>
+                <div class="flex gap-2 mt-6">
+                    <button onclick="closeModal('mKas')" class="flex-1 py-3 text-xs font-black text-slate-400 bg-slate-50 rounded-xl uppercase">Batal</button>
+                    <button onclick="simpanKas()" class="flex-1 py-3 text-xs font-black text-white bg-emerald-900 rounded-xl uppercase shadow-md">Simpan</button>
+                </div>
+            </div>
+        </div>
+
+        <div id="mAnggota" class="modal-back">
+            <div class="modal-card p-6 bg-white rounded-[2.5rem] border border-slate-100 max-w-sm w-full mx-4">
+                <h3 class="text-sm font-black text-slate-800 uppercase tracking-tight mb-4">Tambah Warga Baru</h3>
+                <div class="space-y-4">
+                    <div>
+                        <label class="text-[8px] font-black text-slate-400 uppercase block mb-1">Nama Lengkap Warga</label>
+                        <input type="text" id="aNama" placeholder="Contoh: Haidar Abicandra" class="w-full p-3 bg-slate-50 border border-slate-100 rounded-xl text-xs font-bold uppercase text-slate-700 outline-none focus:border-emerald-800">
+                    </div>
+                    <div>
+                        <label class="text-[8px] font-black text-slate-400 uppercase block mb-1">No. WhatsApp (Tanpa Simbol +)</label>
+                        <input type="number" id="aHp" placeholder="Contoh: 62812345678" class="w-full p-3 bg-slate-50 border border-slate-100 rounded-xl text-xs font-bold text-slate-700 outline-none focus:border-emerald-800">
+                    </div>
+                    <div>
+                        <label class="text-[8px] font-black text-slate-400 uppercase block mb-1">Foto Profil / Avatar (Bebas Batas MB)</label>
+                        <input type="file" id="aFoto" accept="image/*" class="w-full p-2.5 bg-slate-50 border border-slate-100 rounded-xl text-xs font-bold text-slate-400 file:mr-3 file:py-1 file:px-2.5 file:rounded-lg file:border-0 file:text-[9px] file:font-black file:bg-emerald-50 file:text-emerald-700 cursor-pointer">
+                    </div>
+                </div>
+                <div class="flex gap-2 mt-6">
+                    <button onclick="closeModal('mAnggota')" class="flex-1 py-3 text-xs font-black text-slate-400 bg-slate-50 rounded-xl uppercase">Batal</button>
+                    <button onclick="simpanAnggota()" class="flex-1 py-3 text-xs font-black text-white bg-emerald-900 rounded-xl uppercase shadow-md">Daftarkan</button>
+                </div>
+            </div>
+        </div>
+
+        <div id="mDetailIuran" class="modal-back">
+            <div class="modal-card p-6 bg-white rounded-[2.5rem] border border-slate-100 max-w-sm w-full mx-4">
+                <h3 id="mdTitle" class="text-sm font-black text-slate-800 uppercase tracking-tight mb-3">Riwayat</h3>
+                <div id="mdList" class="space-y-2 max-h-60 overflow-y-auto pr-1 custom-scroll">
+                    </div>
+                <button onclick="closeModal('mDetailIuran')" class="w-full mt-5 py-3 text-xs font-black text-white bg-slate-900 rounded-xl uppercase">Tutup Jendela</button>
+            </div>
+        </div>
+
+        <div id="customAlert" class="modal-back">
+            <div class="modal-card p-6 bg-white rounded-[2.5rem] border border-slate-100 max-w-xs w-full text-center mx-4">
+                <div id="alertIcon" class="w-12 h-12 mx-auto rounded-full flex items-center justify-center">
+                    <span class="material-symbols-rounded">check_circle</span>
+                </div>
+                <h3 id="alertTitle" class="text-xs font-black text-slate-800 uppercase tracking-tight mt-4">Notifikasi</h3>
+                <p id="alertMsg" class="text-[10px] font-bold text-slate-400 mt-1.5 leading-relaxed px-1"></p>
+                <button onclick="closeAlert()" class="w-full mt-5 py-3 text-xs font-black text-white bg-slate-900 rounded-xl uppercase tracking-wider shadow-sm">Selesai</button>
+            </div>
+        </div>
+
+        <div id="customConfirm" class="modal-back">
+            <div class="modal-card p-6 bg-white rounded-[2.5rem] border border-slate-100 max-w-xs w-full text-center mx-4">
+                <div class="w-12 h-12 mx-auto bg-amber-50 text-amber-600 rounded-full flex items-center justify-center">
+                    <span class="material-symbols-rounded">help</span>
+                </div>
+                <h3 class="text-xs font-black text-slate-800 uppercase tracking-tight mt-4">Konfirmasi Sistem</h3>
+                <p id="confirmMsg" class="text-[10px] font-bold text-slate-400 mt-1.5 leading-relaxed px-1">Apakah Anda yakin ingin menghapus permanen data ini?</p>
+                <div class="flex gap-2 mt-5">
+                    <button onclick="closeConfirm()" class="flex-1 py-3 text-xs font-black text-slate-400 bg-slate-50 rounded-xl uppercase">Batal</button>
+                    <button id="confirmBtnOk" class="flex-1 py-3 text-xs font-black text-white bg-red-500 rounded-xl uppercase shadow-md">Ya, Hapus</button>
+                </div>
+            </div>
+        </div>
+
+        <nav class="fixed bottom-0 left-0 right-0 max-w-md mx-auto bg-white/80 backdrop-blur-lg border-t border-slate-100 p-2 grid grid-cols-4 gap-1 z-50">
+            <button id="n-kas" onclick="st('kas')" class="active flex flex-col items-center gap-1 py-2 text-slate-400 hover:text-emerald-900 transition-all">
+                <span class="material-symbols-rounded">account_balance_wallet</span>
+                <span class="text-[8px] font-black uppercase tracking-wider">Kas</span>
+            </button>
+            <button id="n-warga" onclick="st('warga')" class="flex flex-col items-center gap-1 py-2 text-slate-400 hover:text-emerald-900 transition-all">
+                <span class="material-symbols-rounded">group</span>
+                <span class="text-[8px] font-black uppercase tracking-wider">Warga</span>
+            </button>
+            <button id="n-iuran" onclick="st('iuran')" class="flex flex-col items-center gap-1 py-2 text-slate-400 hover:text-emerald-900 transition-all">
+                <span class="material-symbols-rounded">receipt_long</span>
+                <span class="text-[8px] font-black uppercase tracking-wider">Iuran</span>
+            </button>
+            <button id="n-sampah" onclick="st('sampah')" class="flex flex-col items-center gap-1 py-2 text-slate-400 hover:text-emerald-900 transition-all">
+                <span class="material-symbols-rounded">delete_sweep</span>
+                <span class="text-[8px] font-black uppercase tracking-wider">Sampah</span>
+            </button>
+        </nav>
+
+    </div>
+
+    <script src="skripe.js"></script>
+</body>
+</html>
