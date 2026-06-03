@@ -3,7 +3,7 @@
  */
 
 // URL Gas paten dan aktif milikmu
-const SCRIPT_URL = "https://script.google.com/macros/s/AKfycb9F6sG4TZNJRI1BNiYGAAYb_38dG6ewbmDIoR-brYonJlA9ivCqhKCln1UxT16-NNN/exec";
+const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbw2O7sydQVyXZZhrsqAMhTABZkFYkL2x5L2x2exlc71Y6Qm-NPiUXYsSKzTsLVR_IJIRQ/exec";
 
 // Simulasi Identitas Warga Aktif (Nanti disesuaikan dengan mekanisme Login/LocalStorage milikmu)
 window.wargaAktif = {
