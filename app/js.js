@@ -3,7 +3,7 @@
  */
 
 // URL Gas andalan dikunci mati sesuai request
-const SCRIPT_URL = "https://script.google.com/macros/s/AKfycb9JsUb0saYvFnH8vpCn2JZu_AzdrXXXmQIcGfMW0dsTvPndFQC_CtKyLhMx_6Kjd_IEg/exec";
+const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbx9F6sG4TZNJRI1BNiYGAAYb_38dG6ewbmDIoR-brYonJlA9ivCqhKCln1UxT16-NNN/exec";
 
 // Variabel Global penampung data database
 window.dataTuntas = {
