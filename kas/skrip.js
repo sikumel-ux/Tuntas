@@ -1,17 +1,23 @@
-// URL REST API Google Apps Script Integration Engine (Pure Google Sheets 2 ID)
-const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxWBiydnhQ5fyhJp-4O4RvfDZyMzykqQWfF-DMQ3WqoEILQ1YO8e-8Fgw7cfjBbkmWt/exec";
+// ==========================================================================
+// TUNTAS - Premium Minimalist Frontend Engine (Figma Style)
+// ==========================================================================
+
+// URL REST API Google Apps Script Integration Engine
+const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbx9JsUb0saYvFnH8vpCn2JZu_AzdrXXXmQIcGfMW0dsTvPndFQC_CtKyLhMx_6Kjd_IEg/exec";
 
 const daftarBulan = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
-// dbGlobal disesuaikan murni dengan struktur nama tab/properti baru dari Sheet kamu
 let dbGlobal = { kas: [], pembayaran: [], anggota: [], sampah: [] };
 let onConfirmSuccess = null;
 
+// --- UI Loading & Modal Control ---
 function showLoading() { document.getElementById('loading').style.display = 'flex'; }
+function hideLoading() { document.getElementById('loading').style.none = 'none'; } // sori, dibetulkan ke display: none
 function hideLoading() { document.getElementById('loading').style.display = 'none'; }
 
 function openModal(id) { document.getElementById(id).classList.add('active'); }
 function closeModal(id) { document.getElementById(id).classList.remove('active'); }
 
+// --- Custom Alert & Confirm (Premium UI) ---
 function tuntasAlert(title, message, type = 'success') {
     const icon = document.getElementById('alertIcon');
     document.getElementById('alertTitle').innerText = title;
@@ -38,6 +44,7 @@ document.getElementById('confirmBtnOk').onclick = function() {
 
 function formatRupiah(num) { return "Rp " + parseFloat(num || 0).toLocaleString('id-ID'); }
 
+// --- Initialization App ---
 function init() {
     const now = new Date();
     document.getElementById('fMulai').value = new Date(now.getFullYear(), now.getMonth(), 1).toISOString().split('T')[0];
@@ -60,14 +67,12 @@ function init() {
     reloadData();
 }
 
-// Mengambil gabungan data dari kedua Spreadsheet melalui Apps Script
+// --- Fetching Data (Gabungan 2 Spreadsheet) ---
 function reloadData() {
     showLoading();
     
-    const urlObj = new URL(SCRIPT_URL);
-    urlObj.searchParams.append("action", "readAllData");
-    
-    fetch(urlObj.toString())
+    // Menggunakan pemanggilan langsung string query parameter untuk menghindari mampet/error action GET
+    fetch(SCRIPT_URL + "?action=readAllData")
         .then(function(res) { return res.json(); })
         .then(function(res) {
             hideLoading();
@@ -75,32 +80,34 @@ function reloadData() {
                 tuntasAlert("Gagal Server", res.message, "error");
                 return;
             }
-            // Mapping data disesuaikan dengan penamaan properti murni dari Sheet barumu
+            
+            // Mapping data murni dari properti return GAS
             dbGlobal.kas = res.kas || [];
             dbGlobal.pembayaran = res.pembayaran || [];
             dbGlobal.anggota = res.anggota || [];
             dbGlobal.sampah = res.sampah || [];
             
+            // Render Dropdown Pilihan Nama Warga di menu Iuran & Sampah
             const iNama = document.getElementById('iNama');
             const sNama = document.getElementById('sNama');
             iNama.innerHTML = sNama.innerHTML = '<option value="">PILIH WARGA</option>';
             
             dbGlobal.anggota.forEach(w => {
-                // Kolom 'Nama' di sheet ANGGOTA
                 const opt = '<option value="' + w.Nama + '">' + w.Nama.toUpperCase() + '</option>';
                 iNama.insertAdjacentHTML('beforeend', opt);
                 sNama.insertAdjacentHTML('beforeend', opt);
             });
+            
             renderDataTabel();
         })
         .catch(function(err) { 
             hideLoading(); 
             console.error("Detail Error:", err);
-            tuntasAlert("Error", "Gagal load data dari server.", "error"); 
+            tuntasAlert("Error", "Gagal menyambung ke server Web Apps.", "error"); 
         });
 }
 
-// LOGIKA RENDER SINKRON DENGAN STRUKTUR KOLOM BARU SHEET 1 & SHEET 2
+// --- Render UI Tabel & Dashboard Matrix ---
 function renderDataTabel() {
     const tMulai = new Date(document.getElementById('fMulai').value);
     const tSelesai = new Date(document.getElementById('fSelesai').value);
@@ -110,7 +117,7 @@ function renderDataTabel() {
     const cont = document.getElementById('listRiwayat');
     cont.innerHTML = "";
 
-    // Render Data SHEET 1 (KAS): Tanggal, Kategori, Keterangan, Nominal
+    // 1. Render data Spreadsheet 1: KAS (Tanggal, Kategori, Keterangan, Nominal)
     dbGlobal.kas.forEach(trx => {
         const nil = parseFloat(trx.Nominal || 0);
         const isMsk = trx.Kategori && trx.Kategori.toLowerCase() === 'masuk';
@@ -136,11 +143,17 @@ function renderDataTabel() {
     document.getElementById('totalMasuk').innerText = formatRupiah(f_masuk);
     document.getElementById('totalKeluar').innerText = formatRupiah(f_keluar);
 
-    // Render Data SHEET 2 (ANGGOTA): Nama, Hp, Password, Foto, Bergabung
+    // 2. Render List Data Warga dari Spreadsheet 2: ANGGOTA (Nama, Hp, Password, Foto, Bergabung)
     const cWarga = document.getElementById('tBodyWarga'); cWarga.innerHTML = "";
     dbGlobal.anggota.forEach(w => {
-        cWarga.innerHTML += '<div class="flex justify-between items-center p-4 bg-white border border-slate-100 rounded-2xl animate-fade-in">' +
-            '<div><p class="text-xs font-black text-slate-800 uppercase">' + w.Nama + '</p><p class="text-[9px] text-slate-400 font-bold mt-0.5"><i class="fa-brands fa-whatsapp"></i> ' + (w.Hp || '-') + '</p></div>' +
+        // Cek ketersediaan link foto avatar warga dari Google Drive
+        const avatar = (w.Foto && w.Foto !== '-') ? w.Foto : 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=facearea&facepad=2&w=256&h=256&q=80';
+        
+        cWarga.innerHTML += '<div class="flex justify-between items-center p-3 bg-white border border-slate-100 rounded-2xl animate-fade-in">' +
+            '<div class="flex items-center gap-3">' +
+                '<img src="' + avatar + '" class="w-9 h-9 rounded-full object-cover border border-slate-100 bg-slate-100">' +
+                '<div><p class="text-xs font-black text-slate-800 uppercase">' + w.Nama + '</p><p class="text-[9px] text-slate-400 font-bold mt-0.5"><i class="fa-brands fa-whatsapp"></i> ' + (w.Hp || '-') + '</p></div>' +
+            '</div>' +
             '<button onclick="hapusTrx(\'anggota\', \'' + w.id + '\')" class="w-8 h-8 flex items-center justify-center text-slate-300 hover:text-red-500"><span class="material-symbols-rounded !text-md">delete</span></button>' +
         '</div>';
     });
@@ -149,12 +162,11 @@ function renderDataTabel() {
         cWarga.innerHTML = '<p class="text-center text-[11px] text-slate-400 py-4 font-semibold">Belum ada data warga.</p>';
     }
 
-    // Render Data SHEET 2 (PEMBAYARAN): Kode, Nama, Tanggal, Keterangan, Nominal
+    // 3. Render Matrix Rekap APPS dari Spreadsheet 2: PEMBAYARAN (Kode, Nama, Tanggal, Keterangan, Nominal)
     const tbRekap = document.getElementById('tb-rekap'); tbRekap.innerHTML = "";
     dbGlobal.anggota.forEach(w => {
-        let tr = '<tr><td class="sticky-col p-3 border-b text-slate-700 uppercase font-black">' + w.Nama + '</td>';
+        let tr = '<tr><td class="sticky-col p-3 border-b text-slate-700 uppercase font-black bg-white">' + w.Nama + '</td>';
         daftarBulan.forEach(bln => {
-            // Mengecek apakah bulan tercatat di kolom Keterangan pembayaran iuran warga tersebut
             const lunas = dbGlobal.pembayaran.some(p => p.Nama && w.Nama && p.Nama.toLowerCase() === w.Nama.toLowerCase() && p.Keterangan && p.Keterangan.includes(bln));
             tr += '<td class="text-center border-b p-2"><span class="inline-block w-5 h-5 rounded-md ' + (lunas ? 'bg-emerald-50 text-emerald-700' : 'bg-slate-100 text-slate-300') + ' font-black text-[10px] flex items-center justify-center mx-auto">' + (lunas ? '✓' : '—') + '</span></td>';
         });
@@ -163,7 +175,7 @@ function renderDataTabel() {
     });
 
     if(dbGlobal.anggota.length === 0) {
-        tbRekap.innerHTML = '<tr><td colspan="14" class="text-center p-4 text-slate-400 font-semibold">Data masih kosong.</td></tr>';
+        tbRekap.innerHTML = '<tr><td colspan="14" class="text-center p-4 text-slate-400 font-semibold">Data matriks iuran masih kosong.</td></tr>';
     }
 }
 
@@ -173,16 +185,20 @@ function postToSheets(fd, msg) {
         .then(res => res.json())
         .then(res => { 
             hideLoading(); 
-            tuntasAlert("Berhasil", msg); 
-            reloadData(); 
+            if(res.status === "error") {
+                tuntasAlert("Gagal", res.message, "error");
+            } else {
+                tuntasAlert("Berhasil", msg); 
+                reloadData(); 
+            }
         })
         .catch(() => { 
             hideLoading(); 
-            tuntasAlert("Gagal", "Koneksi terputus dengan gerbang Spreadsheet", "error"); 
+            tuntasAlert("Gagal", "Koneksi terputus dengan gerbang Google Sheets Backend", "error"); 
         });
 }
 
-// Tambah Kas ke Sheet 1 (KAS)
+// --- Submit Kas Umum (Sheet 1) ---
 function simpanKas() {
     const tgl = document.getElementById('kTgl').value;
     const kat = document.getElementById('kKat').value;
@@ -198,28 +214,48 @@ function simpanKas() {
     fd.append('Nominal', nom);
     
     closeModal('mKas'); 
-    postToSheets(fd, "Kas umum berhasil dicatat ke Spreadsheet 1!");
+    postToSheets(fd, "Kas umum berhasil dicatat ke Spreadsheet KAS!");
 }
 
-// Tambah Warga ke Sheet 2 (ANGGOTA)
+// --- Submit Anggota + Konversi File Foto ke Base64 (Sheet 2 + Google Drive) ---
 function simpanAnggota() {
     const name = document.getElementById('aNama').value.trim();
     const hp = document.getElementById('aHp').value.trim();
+    const fileInput = document.getElementById('aFoto'); // Pastikan di HTML ada <input type="file" id="aFoto">
+    
     if(!name || !hp) return tuntasAlert("Error", "Lengkapi data nama dan nomor WhatsApp!", "error");
     
     const fd = new FormData(); 
     fd.append('action', 'insertAnggota'); 
     fd.append('Nama', name); 
     fd.append('Hp', hp);
-    fd.append('Password', '12345'); // Default password
-    fd.append('Foto', '-');
+    fd.append('Password', '12345'); 
     fd.append('Bergabung', new Date().toISOString().split('T')[0]);
-    
-    closeModal('mAnggota'); 
-    postToSheets(fd, "Data warga berhasil ditambahkan ke Spreadsheet 2!");
+
+    // Jika user mengunggah file foto/gambar
+    if (fileInput && fileInput.files.length > 0) {
+        showLoading();
+        const file = fileInput.files[0];
+        const reader = new FileReader();
+        
+        reader.onload = function(e) {
+            fd.append('FotoData', e.target.result); // Mengirim string base64 gambar
+            fd.append('FotoNama', file.name);
+            fd.append('FotoType', file.type);
+            
+            closeModal('mAnggota');
+            if(fileInput) fileInput.value = ""; // Reset input file
+            postToSheets(fd, "Data warga & foto berhasil diunggah ke Google Drive!");
+        };
+        reader.readAsDataURL(file);
+    } else {
+        // Jika tidak upload foto
+        closeModal('mAnggota'); 
+        postToSheets(fd, "Data warga berhasil didaftarkan tanpa foto!");
+    }
 }
 
-// Tambah Iuran ke Sheet 2 (PEMBAYARAN)
+// --- Submit Pembayaran Iuran Warga (Sheet 2) ---
 function simpanIuran() {
     const nama = document.getElementById('iNama').value;
     const nominal = document.getElementById('iNom').value;
@@ -246,7 +282,7 @@ function simpanIuran() {
     document.getElementById('iNom').value = "";
 }
 
-// Tambah Laporan Sampah ke Sheet 2 (SAMPAH)
+// --- Submit Log Operasional Sampah (Sheet 2) ---
 function simpanLaporanSampah() {
     const tgl = document.getElementById('sTgl').value;
     const nama = document.getElementById('sNama').value;
@@ -262,8 +298,9 @@ function simpanLaporanSampah() {
     postToSheets(fd, "Laporan Operasional Sampah berhasil dicatat!");
 }
 
+// --- Hapus Data Terintegrasi ---
 function hapusTrx(kelompok, id) {
-    tuntasConfirm("Hapus data ini secara permanen?", function() {
+    tuntasConfirm("Hapus data ini secara permanen dari database?", function() {
         const fd = new FormData(); 
         fd.append('action', 'deleteData'); 
         fd.append('type', kelompok); 
@@ -272,6 +309,7 @@ function hapusTrx(kelompok, id) {
     });
 }
 
+// --- Modal Riwayat Sub-Menu Iuran ---
 function bukaDetailIuranWarga(namaWarga) {
     document.getElementById('mdTitle').innerText = "Riwayat: " + namaWarga.toUpperCase();
     const list = document.getElementById('mdList'); list.innerHTML = "";
@@ -291,6 +329,7 @@ function bukaDetailIuranWarga(namaWarga) {
     openModal('mDetailIuran');
 }
 
+// --- SPA Tab Content Navigation Route ---
 function st(t) {
     document.querySelectorAll('.tab-content').forEach(function(screen) {
         screen.style.display = 'none'; 
