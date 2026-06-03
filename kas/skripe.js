@@ -307,7 +307,7 @@ function simpanIuran() {
     const target = dbGlobal.anggota.find(w => w.Nama && w.Nama.toLowerCase() === nama.toLowerCase());
     if(target && target.Hp) {
         let hpKirim = target.Hp.startsWith('+') ? target.Hp.substring(1) : target.Hp;
-        const txt = "Halo, pak/bu *" + nama.toUpperCase() + "*..\nPembayaran Anda telah kami terima dengan no referensi *" + noRef + "*.\n\n---------------------------\nCek e-Kuitansi Anda di:\nhttps://domain.com/kuitansi.html?id=" + noRef + "\n---------------------------\n\nTerimakasih atas partisipasinya.\n\nPengurus TUNTAS,\n\n*APRIYANTO*";
+        const txt = "Halo, pak/bu *" + nama.toUpperCase() + "*..\nPembayaran Anda telah kami terima dengan no referensi *" + noRef + "*.\n\n---------------------------\nCek e-Kuitansi Anda di:\nhttps://sikumel-ux.github.io/Tuntas/kuitansi.html?id=" + noRef + "\n---------------------------\n\nTerimakasih atas partisipasinya.\n\nPengurus TUNTAS,\n\n*APRIYANTO*";
         window.open("https://wa.me/" + hpKirim + "?text=" + encodeURIComponent(txt), '_blank');
     }
     
