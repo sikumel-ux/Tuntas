@@ -4,7 +4,7 @@
  * Upload Foto Profil, & Format Tampilan Tanggal Bergabung Warga.
  */
 
-const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwrICr6f5znEhcq5q9Hz85ipIc-41pz0HyVCr56kEOGd40CTLk7StmQKhSQwNKBBln6/exec";
+const SCRIPT_URL = "https://sikumel-ux.github.io/Tuntas/kas/";
 
 const labelBln = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
 let sessionWarga = null; 
