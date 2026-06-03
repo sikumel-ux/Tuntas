@@ -3,243 +3,604 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>TUNTAS - Member Area</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <title>TUNTAS RT 04 - Member Area</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght=400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,400,0,0" />
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         body { font-family: 'Plus Jakarta Sans', sans-serif; }
-        .glass-card { background: rgba(255, 255, 255, 0.75); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.5); }
-        .active-tab-btn { background-color: #f0fdf4; color: #14532d !important; position: relative; }
-        .active-tab-btn::after { content: ''; position: absolute; bottom: 6px; width: 5px; height: 5px; background: #16a34a; border-radius: 50%; }
-        .modal-blur { display: none; }
-        .modal-blur.active { display: flex; animation: fadeIn 0.2s ease-out forwards; }
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        .glass { background: rgba(255, 255, 255, 0.75); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); }
+        .active-tab-btn { color: #064e3b !important; font-weight: 800; position: relative; }
+        .active-tab-btn::after { content: ''; position: absolute; bottom: -2px; left: 50%; transform: translateX(-50%); width: 16px; height: 3px; background-color: #064e3b; border-radius: 99px; }
+        .modal { display: none; }
+        .modal.active { display: flex; }
     </style>
 </head>
-<body class="bg-slate-50 text-slate-800 min-h-screen pb-24">
+<body class="bg-slate-50 min-h-screen text-slate-800 antialiased flex flex-col pb-24">
 
-    <!-- SCREEN 1: LOGIN -->
-    <div id="screen-login" class="min-h-screen flex flex-col justify-center items-center p-4">
-        <div class="w-full max-w-sm bg-white rounded-[2.5rem] border border-slate-100 shadow-xl p-8 space-y-6">
-            <div class="text-center space-y-2">
-                <div class="w-14 h-14 bg-emerald-50 text-emerald-700 rounded-2xl flex items-center justify-center mx-auto shadow-inner">
-                    <span class="material-symbols-rounded !text-2xl">recycling</span>
+    <section id="screen-login" class="flex-1 flex flex-col justify-center items-center px-5 py-12">
+        <div class="w-full max-w-sm glass border border-white/60 shadow-xl rounded-[2.5rem] p-8 space-y-8 text-center">
+            <div class="space-y-3">
+                <div class="w-14 h-14 bg-emerald-900 text-white rounded-2xl flex items-center justify-center mx-auto shadow-lg shadow-emerald-900/20">
+                    <span class="material-symbols-rounded !text-2xl">delete_sweep</span>
                 </div>
                 <div>
-                    <h2 class="text-xl font-extrabold text-slate-900 tracking-tight">TUNTAS RT 04</h2>
-                    <p class="text-xs font-semibold text-slate-400">Turun Tangan Atasi Sampah & Keuangan</p>
+                    <h1 class="text-xl font-extrabold text-slate-900 tracking-tight">TUNTAS RT 04</h1>
+                    <p class="text-[11px] font-bold text-slate-400 uppercase tracking-widest mt-0.5">Turun Tangan Atasi Sampah</p>
                 </div>
             </div>
 
-            <div class="space-y-4">
+            <div class="space-y-4 text-left">
                 <div class="space-y-1.5">
-                    <label class="text-[11px] font-black uppercase text-slate-400 tracking-wider">No. Whatsapp</label>
+                    <label class="text-[10px] font-black uppercase tracking-wider text-slate-400 ml-1">Nomor Whatsapp</label>
                     <div class="relative">
-                        <span class="absolute left-4 top-3.5 text-slate-400 text-sm font-bold">+62</span>
-                        <input type="number" id="lHp" placeholder="812345678" class="w-full pl-12 pr-4 py-3 bg-slate-50 border border-slate-100 rounded-2xl text-sm font-bold focus:outline-none focus:border-emerald-500 transition-all">
+                        <span class="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 font-bold text-xs">62</span>
+                        <input type="tel" id="lHp" placeholder="8123456xxx" class="w-full bg-slate-100/80 border border-slate-200/50 rounded-2xl pl-10 pr-4 py-3.5 text-xs font-bold text-slate-700 placeholder-slate-400 focus:outline-none focus:border-emerald-700 focus:bg-white transition-all shadow-inner">
                     </div>
                 </div>
                 <div class="space-y-1.5">
-                    <label class="text-[11px] font-black uppercase text-slate-400 tracking-wider">Kata Sandi</label>
+                    <label class="text-[10px] font-black uppercase tracking-wider text-slate-400 ml-1">Kata Sandi</label>
                     <div class="relative">
-                        <input type="password" id="lPass" placeholder="••••••••" class="w-full px-4 py-3 bg-slate-50 border border-slate-100 rounded-2xl text-sm font-bold focus:outline-none focus:border-emerald-500 transition-all">
-                        <button onclick="togglePasswordLogin('lPass', 'iconEye')" class="absolute right-4 top-3.5 text-slate-400">
-                            <i id="iconEye" class="fa-solid fa-eye-slash text-sm"></i>
+                        <input type="password" id="lPass" placeholder="••••••••" class="w-full bg-slate-100/80 border border-slate-200/50 rounded-2xl pl-4 pr-11 py-3.5 text-xs font-bold text-slate-700 placeholder-slate-400 focus:outline-none focus:border-emerald-700 focus:bg-white transition-all shadow-inner">
+                        <button onclick="togglePasswordLogin('lPass', 'eyeIcon')" class="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600">
+                            <i id="eyeIcon" class="fa-solid fa-eye-slash text-sm"></i>
                         </button>
                     </div>
                 </div>
-                <button onclick="prosesLoginWarga()" class="w-full py-3.5 bg-slate-900 hover:bg-slate-800 text-white rounded-2xl text-sm font-black shadow-md transition-transform active:scale-95 mt-2">
-                    MASUK KEBUNGAAN
-                </button>
             </div>
-        </div>
-    </div>
 
-    <!-- SCREEN 2: MAIN DASHBOARD -->
-    <div id="screen-dashboard" class="hidden max-w-md mx-auto p-4 space-y-5">
-        
-        <!-- HEADER PROFILE -->
-        <div class="flex justify-between items-center bg-white border border-slate-100 p-4 rounded-3xl shadow-xs">
-            <div class="flex items-center gap-3">
-                <div class="relative w-11 h-11 bg-slate-100 rounded-xl overflow-hidden flex items-center justify-center border border-slate-200">
-                    <img id="miniAvatar" src="" class="w-full h-full object-cover hidden">
-                    <span id="miniAvatarIcon" class="material-symbols-rounded text-slate-400 !text-xl">account_circle</span>
-                </div>
-                <div>
-                    <h3 id="topNamaWarga" class="text-sm font-black text-slate-800 uppercase tracking-tight">-</h3>
-                    <p id="topHpWarga" class="text-[10px] font-bold text-slate-400 mt-0.5">-</p>
-                </div>
-            </div>
-            <button onclick="logoutWarga()" class="w-9 h-9 bg-rose-50 text-rose-600 rounded-xl flex items-center justify-center transition-all active:scale-90">
-                <span class="material-symbols-rounded !text-lg">logout</span>
+            <button onclick="prosesLoginWarga()" class="w-full bg-slate-900 hover:bg-slate-800 text-white font-extrabold text-xs py-4 rounded-2xl shadow-lg shadow-slate-900/10 active:scale-[0.98] transition-transform uppercase tracking-wider">
+                Masuk Member Area
             </button>
         </div>
+    </section>
 
-        <!-- TAB 1: BERANDA -->
-        <div id="tab-beranda" class="tab-content space-y-5">
-            <!-- FINANCES GLASS CARD -->
-            <div class="bg-gradient-to-br from-emerald-900 to-emerald-950 text-white p-6 rounded-[2.5rem] shadow-xl space-y-6">
+    <section id="screen-dashboard" class="w-full max-w-md mx-auto hidden flex-1 flex flex-col">
+        
+        <header class="p-5 flex justify-between items-center bg-white border-b border-slate-100 shadow-2xs">
+            <div class="flex items-center gap-3">
+                <div class="relative w-10 h-10 rounded-full bg-slate-100 overflow-hidden border border-slate-200 flex items-center justify-center">
+                    <img id="miniAvatar" src="" class="w-full h-full object-cover hidden" alt="Avatar">
+                    <i id="miniAvatarIcon" class="fa-solid fa-user text-slate-400 text-sm"></i>
+                </div>
                 <div>
-                    <p class="text-[10px] font-black uppercase text-emerald-300 tracking-widest">Sisa Saldo Kas RT 04</p>
-                    <h1 id="dashSisaSaldoKas" class="text-3xl font-extrabold tracking-tight mt-1">Rp 0</h1>
+                    <h3 id="topNamaWarga" class="text-xs font-black text-slate-900 leading-tight uppercase tracking-wide">WARGA</h3>
+                    <p id="topHpWarga" class="text-[9px] font-bold text-slate-400 mt-0.5">+62</p>
+                </div>
+            </div>
+            <button onclick="muatSemuaDataServer()" class="w-8 h-8 rounded-xl bg-slate-50 border border-slate-100 flex items-center justify-center text-slate-600 active:rotate-180 transition-transform duration-500">
+                <span class="material-symbols-rounded !text-base">sync</span>
+            </button>
+        </header>
+
+        <main id="tab-dashboard" class="tab-content p-5 space-y-5">
+            <div class="bg-gradient-to-br from-emerald-950 to-emerald-900 text-white rounded-[2.2rem] p-6 shadow-xl shadow-emerald-950/10 space-y-6">
+                <div class="space-y-1">
+                    <p class="text-[9px] font-black text-emerald-300/80 uppercase tracking-widest">Sisa Saldo Kas Utama RT 04</p>
+                    <h1 id="dashSisaSaldoKas" class="text-3xl font-extrabold tracking-tight">Rp 0</h1>
                 </div>
                 <div class="grid grid-cols-2 gap-4 pt-2 border-t border-emerald-800/50">
-                    <div>
-                        <p class="text-[9px] font-bold uppercase text-emerald-400 tracking-wider">Total Masuk</p>
-                        <p id="dashPemasukanKas" class="text-sm font-black mt-0.5">Rp 0</p>
+                    <div class="space-y-0.5">
+                        <p class="text-[9px] font-bold text-emerald-300/60 uppercase tracking-wider flex items-center gap-1"><span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span> Total Masuk</p>
+                        <p id="dashPemasukanKas" class="text-xs font-extrabold">Rp 0</p>
                     </div>
-                    <div>
-                        <p class="text-[9px] font-bold uppercase text-rose-400 tracking-wider">Total Keluar</p>
-                        <p id="dashPengeluaranKas" class="text-sm font-black mt-0.5">Rp 0</p>
+                    <div class="space-y-0.5">
+                        <p class="text-[9px] font-bold text-emerald-300/60 uppercase tracking-wider flex items-center gap-1"><span class="w-1.5 h-1.5 rounded-full bg-rose-400"></span> Total Keluar</p>
+                        <p id="dashPengeluaranKas" class="text-xs font-extrabold">Rp 0</p>
                     </div>
                 </div>
             </div>
 
-            <!-- ARUS KAS LOG -->
-            <div class="bg-white border border-slate-100 rounded-[2.5rem] p-6 shadow-xs space-y-4">
-                <h4 class="text-xs font-black text-slate-900 uppercase tracking-wider flex items-center gap-2">
-                    <span class="w-1.5 h-3 bg-emerald-600 rounded-full"></span> Histori Kas Terbaru
-                </h4>
-                <div id="listMutasiKasDashboard" class="space-y-1 divide-y divide-slate-50 max-h-64 overflow-y-auto pr-1">
-                    <!-- Dinamis -->
-                </div>
-            </div>
-        </div>
-
-        <!-- TAB 2: IURAN -->
-        <div id="tab-iuran" class="tab-content space-y-5 hidden">
-            <!-- STATUS CARD -->
-            <div class="bg-white border border-slate-100 p-6 rounded-[2.5rem] shadow-xs text-center space-y-2">
-                <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Akumulasi Kontribusi Saya</p>
-                <h2 id="dataTotalKontribusi" class="text-2xl font-black text-slate-800 tracking-tight">Rp 0</h2>
-            </div>
-
-            <!-- GRID BULANAN -->
-            <div class="bg-white border border-slate-100 rounded-[2.5rem] p-6 shadow-xs space-y-4">
-                <h4 class="text-xs font-black text-slate-900 uppercase tracking-wider flex items-center gap-2">
-                    <span class="w-1.5 h-3 bg-emerald-600 rounded-full"></span> Matriks Iuran 2026
-                </h4>
-                <div id="statusBulanGrid" class="grid grid-cols-3 gap-3">
-                    <!-- Dinamis -->
-                </div>
-            </div>
-
-            <!-- METODE TRANSFER -->
-            <div class="bg-white border border-slate-100 rounded-[2.5rem] p-6 shadow-xs space-y-4">
-                <h4 class="text-xs font-black text-slate-900 uppercase tracking-wider">Info Rekening Kas RT</h4>
-                <div class="bg-slate-50 border border-slate-100 p-4 rounded-2xl flex justify-between items-center">
-                    <div>
-                        <p class="text-[9px] font-black text-slate-400 uppercase tracking-wider">BANK BCA (BENDAHARA)</p>
-                        <p id="noRekText" class="text-sm font-black text-slate-800 tracking-tight mt-0.5">8041234567</p>
+            <div class="space-y-3">
+                <h4 class="text-[10px] font-black text-slate-400 uppercase tracking-wider ml-1">Log Aliran Kas RT Terbaru</h4>
+                <div id="listMutasiKasDashboard" class="bg-white border border-slate-100 rounded-3xl p-4 max-h-60 overflow-y-auto space-y-0.5">
                     </div>
-                    <button onclick="salinRekening()" class="w-9 h-9 bg-white text-slate-700 border border-slate-100 rounded-xl flex items-center justify-center active:scale-95 shadow-2xs">
-                        <span class="material-symbols-rounded !text-base">content_copy</span>
-                    </button>
+            </div>
+        </main>
+
+        <main id="tab-iuran" class="tab-content p-5 space-y-5 hidden">
+            <div class="bg-white border border-slate-100 rounded-[2.2rem] p-6 text-center shadow-xs space-y-2">
+                <div class="w-10 h-10 bg-emerald-50 rounded-xl flex items-center justify-center text-emerald-700 mx-auto">
+                    <span class="material-symbols-rounded">volunteer_activism</span>
                 </div>
-                <button onclick="kirimKonfirmasiWA()" class="w-full py-3 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-black rounded-xl tracking-wide flex items-center justify-center gap-2 shadow-sm transition-transform active:scale-95">
-                    <i class="fa-brands fa-whatsapp text-sm"></i> KONFIRMASI VIA WHATSAPP
+                <div class="space-y-0.5">
+                    <p class="text-[9px] font-black text-slate-400 uppercase tracking-wider">Total Kontribusi Iuran Anda</p>
+                    <h2 id="dataTotalKontribusi" class="text-xl font-extrabold text-slate-900 tracking-tight">Rp 0</h2>
+                </div>
+            </div>
+
+            <div class="space-y-3">
+                <h4 class="text-[10px] font-black text-slate-400 uppercase tracking-wider ml-1">Status Iuran Bulanan 2026</h4>
+                <div id="statusBulanGrid" class="grid grid-cols-3 gap-2.5">
+                    </div>
+            </div>
+
+            <div class="bg-slate-900 text-slate-100 rounded-3xl p-5 shadow-xs space-y-4">
+                <div class="flex justify-between items-start">
+                    <div class="space-y-0.5">
+                        <p class="text-[8px] font-black text-slate-400 uppercase tracking-widest">Bank Transfer Tujuan</p>
+                        <h4 class="text-xs font-black tracking-tight text-white uppercase">Bank BCA RT 04</h4>
+                    </div>
+                    <span class="text-[10px] font-black bg-white/10 px-2 py-0.5 rounded-md tracking-wider">KAS UTAMA</span>
+                </div>
+                <div class="flex justify-between items-center bg-white/5 rounded-2xl p-3.5 border border-white/5">
+                    <div>
+                        <p class="text-[8px] font-bold text-slate-400 uppercase">Nomor Rekening</p>
+                        <p id="noRekText" class="text-sm font-black tracking-widest text-emerald-400 mt-0.5">8465291034</p>
+                    </div>
+                    <button onclick="salinRekening()" class="w-8 h-8 rounded-xl bg-white/10 text-white flex items-center justify-center text-xs active:scale-90 transition-transform"><i class="fa-regular fa-copy"></i></button>
+                </div>
+                <button onclick="kirimKonfirmasiWA()" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold text-[11px] py-3.5 rounded-xl flex items-center justify-center gap-2 transition-colors uppercase tracking-wider">
+                    <i class="fa-brands fa-whatsapp text-sm"></i> Kirim Bukti Transfer
                 </button>
             </div>
-        </div>
+        </main>
 
-        <!-- TAB 3: SAMPAH -->
-        <div id="tab-sampah" class="tab-content space-y-5 hidden">
-            <div class="bg-white border border-slate-100 rounded-[2.5rem] p-6 shadow-xs space-y-4">
-                <h4 id="judulKalenderSampah" class="text-xs font-black text-slate-900 uppercase tracking-wider text-center">Status Sampah Bulan Ini</h4>
-                <div class="grid grid-cols-7 gap-2 text-center text-[10px] font-black text-slate-400 uppercase border-b border-slate-50 pb-2">
-                    <span>S</span><span>S</span><span>R</span><span>K</span><span>J</span><span>S</span><span>M</span>
+        <main id="tab-sampah" class="tab-content p-5 space-y-4 hidden">
+            <div class="bg-white border border-slate-100 rounded-[2.2rem] p-5 shadow-xs space-y-4">
+                <div class="flex justify-between items-center px-1">
+                    <h3 id="judulKalenderSampah" class="text-xs font-black text-slate-800 uppercase tracking-wide">Status Sampah Bulan Ini</h3>
+                    <span class="w-2 h-2 rounded-full bg-emerald-500 animate-ping"></span>
                 </div>
                 <div id="gridAngkaKalender" class="grid grid-cols-7 gap-2">
-                    <!-- Dinamis -->
+                    </div>
+                <div class="flex items-center gap-4 pt-3 border-t border-slate-50 text-[10px] font-bold text-slate-400 uppercase tracking-wider justify-center">
+                    <div class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-md bg-emerald-500"></span> Diambil</div>
+                    <div class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-md bg-rose-500"></span> Terlewat</div>
+                    <div class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-md bg-slate-100 border border-slate-200"></span> Kosong</div>
                 </div>
             </div>
-        </div>
+        </main>
 
-        <!-- TAB 4: PROFILE -->
-        <div id="tab-profile" class="tab-content space-y-5 hidden">
-            <!-- AVATAR MANAGEMENT -->
-            <div class="bg-white border border-slate-100 rounded-[2.5rem] p-6 shadow-xs text-center space-y-3 flex flex-col items-center">
-                <div class="relative w-24 h-24 bg-slate-50 border border-slate-200/60 rounded-3xl overflow-hidden flex items-center justify-center shadow-inner group">
+        <main id="tab-setting" class="tab-content p-5 space-y-5 hidden">
+            <div class="bg-white border border-slate-100 rounded-[2.2rem] p-5 shadow-xs text-center space-y-3 relative overflow-hidden">
+                <div onclick="pemicuPilihFoto()" class="group relative w-20 h-20 mx-auto rounded-full bg-slate-50 border-2 border-dashed border-slate-200 flex items-center justify-center cursor-pointer overflow-hidden transition-all hover:border-emerald-700">
                     <img id="avatarImage" src="" class="w-full h-full object-cover hidden">
-                    <span id="avatarIconDefault" class="material-symbols-rounded text-slate-300 !text-5xl">account_circle</span>
+                    <span id="avatarIconDefault" class="material-symbols-rounded !text-3xl text-slate-300 group-hover:text-emerald-700">add_a_photo</span>
+                    <input type="file" id="fileFotoInput" accept="image/*" class="hidden" onchange="prosesKonversiFoto(this)">
                 </div>
                 <div>
-                    <h3 id="infoNamaUser" class="text-sm font-black text-slate-800 uppercase tracking-tight">-</h3>
-                    <p id="infoHpUser" class="text-[10px] font-bold text-slate-400 mt-0.5">-</p>
-                    <p id="infoBergabung" class="text-[9px] font-bold text-emerald-600 mt-1 uppercase tracking-wider bg-emerald-50 px-2.5 py-0.5 rounded-full inline-block">-</p>
+                    <h3 id="infoNamaUser" class="text-xs font-black text-slate-800 uppercase tracking-wide">-</h3>
+                    <p id="infoHpUser" class="text-[9px] font-bold text-slate-400 mt-0.5">+62</p>
+                    <p id="infoBergabung" class="text-[9px] font-black text-emerald-700 bg-emerald-50 px-2.5 py-1 rounded-full inline-block mt-2 uppercase tracking-wide"></p>
                 </div>
-                <input type="file" id="fileFotoInput" accept="image/*" class="hidden" onchange="prosesKonversiFoto(this)">
-                <button onclick="pemicuPilihFoto()" class="px-4 py-2 bg-slate-900 hover:bg-slate-800 text-white text-[11px] font-black rounded-xl uppercase tracking-wider transition-all active:scale-95 shadow-sm">
-                    Ganti Foto Profil
-                </button>
             </div>
 
-            <!-- GANTI SANDI -->
-            <div class="bg-white border border-slate-100 rounded-[2.5rem] p-6 shadow-xs space-y-4">
-                <h4 class="text-xs font-black text-slate-900 uppercase tracking-wider">Ubah Kata Sandi</h4>
+            <div class="bg-white border border-slate-100 rounded-[2.2rem] p-5 shadow-xs space-y-4">
+                <div class="space-y-1">
+                    <h4 class="text-xs font-black text-slate-800 uppercase tracking-wide">Perbarui Kata Sandi</h4>
+                    <p class="text-[9px] font-bold text-slate-400 leading-tight">Amankan akun Anda dengan mengganti sandi secara berkala.</p>
+                </div>
                 <div class="space-y-1.5">
-                    <label class="text-[10px] font-black text-slate-400 uppercase tracking-wider">Kata Sandi Baru</label>
-                    <input type="text" id="newPass" placeholder="Masukkan sandi baru" class="w-full px-4 py-3 bg-slate-50 border border-slate-100 rounded-xl text-xs font-bold focus:outline-none focus:border-emerald-500">
+                    <div class="relative">
+                        <input type="password" id="newPass" placeholder="Ketik Sandi Baru..." class="w-full bg-slate-50 border border-slate-100 rounded-2xl pl-4 pr-11 py-3 text-xs font-bold text-slate-700 placeholder-slate-400 focus:outline-none focus:border-emerald-700 focus:bg-white transition-all shadow-inner">
+                        <button onclick="togglePasswordLogin('newPass', 'eyeIconNew')" class="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400">
+                            <i id="eyeIconNew" class="fa-solid fa-eye-slash text-sm"></i>
+                        </button>
+                    </div>
                 </div>
-                <button onclick="simpanSandiBaruSheets()" class="w-full py-3 bg-emerald-900 hover:bg-emerald-950 text-white text-xs font-black rounded-xl tracking-wider transition-transform active:scale-95">
-                    SIMPAN PERUBAHAN
+                <button onclick="simpanSandiBaruSheets()" class="w-full bg-slate-900 hover:bg-slate-800 text-white font-extrabold text-[11px] py-3.5 rounded-2xl transition-all uppercase tracking-wider shadow-md shadow-slate-900/5">
+                    Simpan Sandi Baru
                 </button>
             </div>
-        </div>
 
-        <!-- FIXED BOTTOM NAVIGATION BAR -->
-        <nav class="fixed bottom-4 left-4 right-4 max-w-sm mx-auto h-16 bg-white/90 backdrop-blur-md border border-slate-100 rounded-2xl shadow-xl flex justify-around items-center px-2 z-40">
-            <button onclick="switchTab('tab-beranda', this)" class="flex flex-col items-center justify-center w-12 h-12 rounded-xl text-slate-400 transition-all active:scale-90 active-tab-btn">
-                <span class="material-symbols-rounded !text-[22px]">home</span>
+            <button onclick="logoutWarga()" class="w-full bg-rose-50 border border-rose-100 text-rose-600 font-extrabold text-[11px] py-4 rounded-2xl transition-colors uppercase tracking-widest text-center">
+                <i class="fa-solid fa-power-off mr-1.5"></i> Keluar Dari Akun
             </button>
-            <button onclick="switchTab('tab-iuran', this)" class="flex flex-col items-center justify-center w-12 h-12 rounded-xl text-slate-400 transition-all active:scale-90">
-                <span class="material-symbols-rounded !text-[22px]">payments</span>
+        </main>
+
+        <nav class="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-md bg-white/90 backdrop-blur-xl border-t border-slate-100 px-4 py-3.5 flex justify-around items-center z-40 shadow-xl rounded-t-[2rem]">
+            <button onclick="switchTab('tab-dashboard', this)" class="flex flex-col items-center gap-1 text-slate-400 active-tab-btn transition-all">
+                <span class="material-symbols-rounded !text-xl">grid_view</span>
+                <span class="text-[9px] font-bold uppercase tracking-tight">Home</span>
             </button>
-            <button onclick="switchTab('tab-sampah', this)" class="flex flex-col items-center justify-center w-12 h-12 rounded-xl text-slate-400 transition-all active:scale-90">
-                <span class="material-symbols-rounded !text-[22px]">delete_history</span>
+            <button onclick="switchTab('tab-iuran', this)" class="flex flex-col items-center gap-1 text-slate-400 transition-all">
+                <span class="material-symbols-rounded !text-xl">account_balance_wallet</span>
+                <span class="text-[9px] font-bold uppercase tracking-tight">Iuran</span>
             </button>
-            <button onclick="switchTab('tab-profile', this)" class="flex flex-col items-center justify-center w-12 h-12 rounded-xl text-slate-400 transition-all active:scale-90">
-                <span class="material-symbols-rounded !text-[22px]">manage_accounts</span>
+            <button onclick="switchTab('tab-sampah', this)" class="flex flex-col items-center gap-1 text-slate-400 transition-all">
+                <span class="material-symbols-rounded !text-xl">calendar_month</span>
+                <span class="text-[9px] font-bold uppercase tracking-tight">Sampah</span>
+            </button>
+            <button onclick="switchTab('tab-setting', this)" class="flex flex-col items-center gap-1 text-slate-400 transition-all">
+                <span class="material-symbols-rounded !text-xl">manage_accounts</span>
+                <span class="text-[9px] font-bold uppercase tracking-tight">Profil</span>
             </button>
         </nav>
+    </section>
+
+    <div id="loading" class="fixed inset-0 bg-slate-950/40 backdrop-blur-xs flex flex-col justify-center items-center z-50 transition-all" style="display: none;">
+        <div class="p-5 bg-white rounded-3xl shadow-xl flex flex-col items-center gap-3">
+            <div class="w-8 h-8 border-4 border-slate-200 border-t-emerald-900 rounded-full animate-spin"></div>
+            <p class="text-[9px] font-black text-slate-400 uppercase tracking-widest">Sinkronisasi...</p>
+        </div>
     </div>
 
-    <!-- GLOBAL COMPONENT: LOADING OVERLAY -->
-    <div id="loading" class="fixed inset-0 bg-slate-900/40 backdrop-blur-xs z-50 flex flex-col justify-center items-center gap-3" style="display: none;">
-        <div class="w-10 h-10 border-4 border-slate-200 border-t-emerald-600 rounded-full animate-spin"></div>
-        <p class="text-[10px] font-black text-white tracking-widest uppercase">Memproses Data...</p>
+    <div id="mDetailSampah" class="modal fixed inset-0 bg-slate-950/30 backdrop-blur-xs p-5 justify-center items-center z-50">
+        <div class="w-full max-w-xs bg-white rounded-[2rem] shadow-xl p-5 border border-slate-100 text-center space-y-4">
+            <div id="popBoxIcon" class="w-12 h-12 bg-slate-50 text-slate-400 rounded-xl flex items-center justify-center mx-auto">
+                <span class="material-symbols-rounded">delete_history</span>
+            </div>
+            <div class="space-y-1">
+                <h4 id="popTglJudul" class="text-[11px] font-black text-slate-400 uppercase tracking-wide">PENGAMBILAN</h4>
+                <h2 id="popStatusTeks" class="text-base font-extrabold text-slate-800 tracking-tight">-</h2>
+                <p id="popJamWaktu" class="text-[10px] font-semibold text-slate-400">-</p>
+            </div>
+            <button onclick="closeModal('mDetailSampah')" class="w-full bg-slate-100 hover:bg-slate-200 text-slate-700 font-extrabold text-[11px] py-3 rounded-xl transition-colors uppercase tracking-wider">Tutup Detail</button>
+        </div>
     </div>
 
-    <!-- GLOBAL COMPONENT: CUSTOM DIALOG ALERT -->
-    <div id="customAlert" class="fixed inset-0 bg-slate-900/30 backdrop-blur-xs z-50 p-4 justify-center items-center modal-blur">
-        <div class="w-full max-w-xs bg-white rounded-[2rem] p-6 text-center space-y-4 shadow-2xl border border-slate-50">
+    <div id="customAlert" class="modal fixed inset-0 bg-slate-950/30 backdrop-blur-xs p-5 justify-center items-center z-50">
+        <div class="w-full max-w-xs bg-white rounded-[2rem] shadow-xl p-5 text-center space-y-4 border border-slate-50">
             <div id="alertIcon" class="w-12 h-12 mx-auto rounded-full flex items-center justify-center"></div>
             <div class="space-y-1">
-                <h3 id="alertTitle" class="text-sm font-black text-slate-900 uppercase tracking-tight"></h3>
-                <p id="alertMsg" class="text-xs font-semibold text-slate-400 leading-relaxed px-1"></p>
+                <h3 id="alertTitle" class="text-xs font-black text-slate-900 uppercase tracking-wide">-</h3>
+                <p id="alertMsg" class="text-[10px] font-semibold text-slate-400 leading-relaxed px-2">-</p>
             </div>
-            <button onclick="closeAlert()" class="w-full py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-800 text-xs font-black rounded-xl tracking-wider">OKEY</button>
+            <button onclick="closeAlert()" class="w-full bg-slate-900 hover:bg-slate-800 text-white font-extrabold text-[11px] py-3 rounded-xl transition-transform uppercase tracking-wider active:scale-95">Mengerti</button>
         </div>
     </div>
 
-    <!-- DETAIL SAMPAH POPUP MODAL -->
-    <div id="mDetailSampah" class="fixed inset-0 bg-slate-900/30 backdrop-blur-xs z-50 p-4 justify-center items-center modal-blur">
-        <div class="w-full max-w-xs bg-white rounded-[2rem] p-6 text-center space-y-4 shadow-2xl border border-slate-50">
-            <div id="popBoxIcon" class="w-12 h-12 mx-auto rounded-xl flex items-center justify-center">
-                <span class="material-symbols-rounded">delete_outline</span>
-            </div>
-            <div class="space-y-1">
-                <h3 id="popTglJudul" class="text-xs font-black text-slate-400 uppercase tracking-wider"></h3>
-                <h2 id="popStatusTeks" class="text-base font-black tracking-tight"></h2>
-                <p id="popJamWaktu" class="text-[11px] font-bold text-slate-400 mt-1"></p>
-            </div>
-            <button onclick="closeModal('mDetailSampah')" class="w-full py-2.5 bg-slate-900 text-white text-xs font-black rounded-xl tracking-wider uppercase">Tutup Kalender</button>
-        </div>
-    </div>
+    <script>
+        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzt1GIvQ2tMRz0rnBEgIoqq75858xW_xsbOf1TCDwAoADVmfeV61vVOMPxCvDIz1JG8/exec";
 
-    <!-- LINK ENGINE CORE -->
-    <script src="users.js"></script>
+        window.dbTuntas = { anggota: [], kas: [], pembayaran: [], sampah: [] };
+        window.sessionWarga = null;
+
+        document.addEventListener("DOMContentLoaded", () => {
+            const savedSession = localStorage.getItem("tuntasWargaSession");
+            if (savedSession) {
+                window.sessionWarga = JSON.parse(savedSession);
+                document.getElementById("screen-login").classList.add("hidden");
+                document.getElementById("screen-dashboard").classList.remove("hidden");
+                muatSemuaDataServer();
+            } else {
+                showLoading(false);
+            }
+        });
+
+        async function prosesLoginWarga() {
+            const inputHp = document.getElementById("lHp").value.trim();
+            const inputPass = document.getElementById("lPass").value.trim();
+
+            if (!inputHp || !inputPass) {
+                openAlert("error", "Gagal Masuk", "Nomor Whatsapp dan Kata Sandi wajib diisi!");
+                return;
+            }
+
+            showLoading(true);
+            try {
+                const respon = await fetch(`${SCRIPT_URL}?action=readAllData`);
+                if (!respon.ok) throw new Error("Gagal terhubung ke jaringan server.");
+
+                const hasil = await respon.json();
+                if (hasil.status === "success") {
+                    window.dbTuntas = hasil.data;
+
+                    const wargaDitemukan = window.dbTuntas.anggota.find(w => {
+                        const hpDb = (w.Hp || "").toString().trim().replace(/\D/g, "");
+                        const hpIn = inputHp.replace(/\D/g, "");
+                        return hpDb === hpIn || hpDb === "62" + hpIn || hpDb === hpIn.replace(/^0/, "62");
+                    });
+
+                    if (!wargaDitemukan) {
+                        openAlert("error", "Akses Ditolak", "Nomor Whatsapp tidak terdaftar di warga RT 04.");
+                        return;
+                    }
+
+                    const passDb = (wargaDitemukan.Password || "123").toString().trim();
+                    if (passDb !== inputPass) {
+                        openAlert("error", "Akses Ditolak", "Kata sandi yang Anda masukkan salah.");
+                        return;
+                    }
+
+                    window.sessionWarga = wargaDitemukan;
+                    localStorage.setItem("tuntasWargaSession", JSON.stringify(wargaDitemukan));
+
+                    document.getElementById("screen-login").classList.add("hidden");
+                    document.getElementById("screen-dashboard").classList.remove("hidden");
+
+                    jalankanRenderSemuaKomponen();
+                } else {
+                    throw new Error(hasil.message);
+                }
+            } catch (err) {
+                console.error(err);
+                openAlert("error", "Otentikasi Gagal", `Sistem gagal membaca database: ${err.message}`);
+            } finally {
+                showLoading(false);
+            }
+        }
+
+        async function muatSemuaDataServer() {
+            showLoading(true);
+            try {
+                const respon = await fetch(`${SCRIPT_URL}?action=readAllData`);
+                if (!respon.ok) throw new Error("Koneksi jaringan server terputus.");
+
+                const hasil = await respon.json();
+                if (hasil.status === "success") {
+                    window.dbTuntas = hasil.data;
+                    
+                    const dataTerbaru = window.dbTuntas.anggota.find(w => w.Hp.toString().trim() === window.sessionWarga.Hp.toString().trim());
+                    if (dataTerbaru) {
+                        window.sessionWarga = dataTerbaru;
+                        localStorage.setItem("tuntasWargaSession", JSON.stringify(dataTerbaru));
+                    }
+                    jalankanRenderSemuaKomponen();
+                } else {
+                    throw new Error(hasil.message);
+                }
+            } catch (err) {
+                console.error(err);
+                openAlert("error", "Sinkronisasi Gagal", "Gagal memuat pembaruan data terpusat.");
+            } finally {
+                showLoading(false);
+            }
+        }
+
+        function jalankanRenderSemuaKomponen() {
+            if (!window.sessionWarga) return;
+
+            // A. Identity Header Loader
+            document.getElementById("topNamaWarga").innerText = window.sessionWarga.Nama.toUpperCase();
+            document.getElementById("topHpWarga").innerText = `+${window.sessionWarga.Hp}`;
+            
+            const miniAvatar = document.getElementById("miniAvatar");
+            const miniAvatarIcon = document.getElementById("miniAvatarIcon");
+            if (window.sessionWarga.Foto && window.sessionWarga.Foto.trim() !== "") {
+                miniAvatar.src = window.sessionWarga.Foto;
+                miniAvatar.classList.remove("hidden");
+                miniAvatarIcon.classList.add("hidden");
+            } else {
+                miniAvatar.classList.add("hidden");
+                miniAvatarIcon.classList.remove("hidden");
+            }
+
+            // B. Mutasi Realtime Kas Utama (Sheet 1)
+            let totalMasuk = 0; let totalKeluar = 0;
+            window.dbTuntas.kas.forEach(k => {
+                const nom = parseFloat(k.Nominal) || 0;
+                const kat = k.Kategori.toLowerCase().trim();
+                if (kat === "masuk" || kat === "pemasukan") totalMasuk += nom;
+                if (kat === "keluar" || kat === "pengeluaran") totalKeluar += nom;
+            });
+
+            document.getElementById("dashPemasukanKas").innerText = formatRupiah(totalMasuk);
+            document.getElementById("dashPengeluaranKas").innerText = formatRupiah(totalKeluar);
+            document.getElementById("dashSisaSaldoKas").innerText = formatRupiah(totalMasuk - totalKeluar);
+
+            const containerMutasi = document.getElementById("listMutasiKasDashboard");
+            containerMutasi.innerHTML = "";
+            if (window.dbTuntas.kas.length === 0) {
+                containerMutasi.innerHTML = `<p class="text-center text-[10px] text-slate-400 py-4 font-bold">Belum ada histori kas.</p>`;
+            } else {
+                window.dbTuntas.kas.slice(-15).reverse().forEach(k => {
+                    const isMasuk = k.Kategori.toLowerCase().trim() === "masuk" || k.Kategori.toLowerCase().trim() === "pemasukan";
+                    const div = document.createElement("div");
+                    div.className = "flex justify-between items-center py-2.5 border-b border-slate-50 text-[11px]";
+                    div.innerHTML = `
+                        <div>
+                            <p class="font-bold text-slate-700 uppercase tracking-tight">${k.Keterangan}</p>
+                            <p class="text-[8px] text-slate-400 font-bold mt-0.5">${k.Tanggal}</p>
+                        </div>
+                        <p class="font-black ${isMasuk ? 'text-emerald-600' : 'text-rose-600'}">${isMasuk ? '+' : '-'} ${formatRupiah(k.Nominal)}</p>
+                    `;
+                    containerMutasi.appendChild(div);
+                });
+            }
+
+            // C. Hitung Tab Iuran Berdasarkan Nama Warga (Sheet 2)
+            let totalKontribusiSaya = 0;
+            const listIuranSaya = window.dbTuntas.pembayaran.filter(p => p.Nama.toLowerCase().trim() === window.sessionWarga.Nama.toLowerCase().trim());
+            listIuranSaya.forEach(p => { totalKontribusiSaya += parseFloat(p.Nominal) || 0; });
+            document.getElementById("dataTotalKontribusi").innerText = formatRupiah(totalKontribusiSaya);
+
+            const containerIuranGrid = document.getElementById("statusBulanGrid");
+            containerIuranGrid.innerHTML = "";
+            const listBulan = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
+            listBulan.forEach((b, index) => {
+                const sudahBayarBulanIni = listIuranSaya.some(p => p.Keterangan.toLowerCase().includes(b.toLowerCase()) || p.Tanggal.includes(`-${String(index+1).padStart(2,'0')}-`));
+                const box = document.createElement("div");
+                box.className = `p-2.5 rounded-2xl border text-center flex flex-col justify-center items-center shadow-2xs ${sudahBayarBulanIni ? 'bg-emerald-50 border-emerald-100 text-emerald-800' : 'bg-slate-50 border-slate-100 text-slate-400'}`;
+                box.innerHTML = `
+                    <span class="text-[10px] font-black uppercase tracking-tight">${b.substring(0, 3)}</span>
+                    <span class="text-[8px] font-black mt-0.5">${sudahBayarBulanIni ? 'LUNAS' : 'BLM'}</span>
+                `;
+                containerIuranGrid.appendChild(box);
+            });
+
+            // D. Kalender Sampah Bulanan (Sheet 2)
+            renderKalenderSampahWarga();
+
+            // E. Settings Profil Loader
+            document.getElementById("infoNamaUser").innerText = window.sessionWarga.Nama.toUpperCase();
+            document.getElementById("infoHpUser").innerText = `+${window.sessionWarga.Hp}`;
+            document.getElementById("infoBergabung").innerHTML = `<i class="fa-solid fa-calendar-check mr-1.5"></i> Warga Sejak: ${window.sessionWarga.Bergabung || '-'}`;
+            
+            const imgProfile = document.getElementById("avatarImage");
+            const iconProfile = document.getElementById("avatarIconDefault");
+            if (window.sessionWarga.Foto && window.sessionWarga.Foto.trim() !== "") {
+                imgProfile.src = window.sessionWarga.Foto;
+                imgProfile.classList.remove("hidden");
+                iconProfile.classList.add("hidden");
+            } else {
+                imgProfile.classList.add("hidden");
+                iconProfile.classList.remove("hidden");
+            }
+        }
+
+        function renderKalenderSampahWarga() {
+            const gridAngka = document.getElementById("gridAngkaKalender");
+            gridAngka.innerHTML = "";
+            const tglSekarang = new Date();
+            const bulanSekarang = tglSekarang.getMonth();
+            const tahunSekarang = tglSekarang.getFullYear();
+            
+            const namaBulanIndo = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
+            document.getElementById("judulKalenderSampah").innerText = `Status Sampah - ${namaBulanIndo[bulanSekarang]} ${tahunSekarang}`;
+
+            const sampahSaya = window.dbTuntas.sampah.filter(s => s.Nama.toLowerCase().trim() === window.sessionWarga.Nama.toLowerCase().trim());
+            const jumlahHari = new Date(tahunSekarang, bulanSekarang + 1, 0).getDate();
+
+            for (let hari = 1; hari <= jumlahHari; hari++) {
+                const stringHari = String(hari).padStart(2, '0');
+                const stringBulan = String(bulanSekarang + 1).padStart(2, '0');
+                const formatTanggalCek = `${tahunSekarang}-${stringBulan}-${stringHari}`;
+
+                const logHariIni = sampahSaya.find(s => s.Tanggal === formatTanggalCek);
+                let warnaBg = "bg-slate-50 text-slate-400 border-slate-100";
+                let statusTeks = "Belum di-record";
+
+                if (logHariIni) {
+                    const stat = logHariIni.Status.toLowerCase().trim();
+                    if (stat === "diambil") {
+                        warnaBg = "bg-emerald-500 text-white border-emerald-600";
+                        statusTeks = "Diambil Petugas";
+                    } else {
+                        warnaBg = "bg-rose-500 text-white border-rose-600";
+                        statusTeks = "Petugas Terlewat";
+                    }
+                }
+
+                const elemenHari = document.createElement("button");
+                elemenHari.className = `p-2 text-[10px] font-black rounded-xl border shadow-3xs transition-all active:scale-90 ${warnaBg}`;
+                elemenHari.innerText = hari;
+                elemenHari.onclick = () => {
+                    bukaModalDetailSampah(formatTanggalCek, statusTeks, logHariIni ? "Log Tercatat Bulanan" : "Belum ada aktivitas armada.");
+                };
+                gridAngka.appendChild(elemenHari);
+            }
+        }
+
+        function bukaModalDetailSampah(tanggal, status, keterangan) {
+            document.getElementById("popTglJudul").innerText = `${tanggal}`;
+            document.getElementById("popStatusTeks").innerText = status.toUpperCase();
+            document.getElementById("popJamWaktu").innerText = keterangan;
+            const iconBox = document.getElementById("popBoxIcon");
+            if (status.includes("Diambil")) {
+                iconBox.className = "w-12 h-12 mx-auto rounded-xl flex items-center justify-center shadow-xs bg-emerald-50 text-emerald-600";
+            } else if (status.includes("Terlewat")) {
+                iconBox.className = "w-12 h-12 mx-auto rounded-xl flex items-center justify-center shadow-xs bg-rose-50 text-rose-600";
+            } else {
+                iconBox.className = "w-12 h-12 mx-auto rounded-xl flex items-center justify-center shadow-xs bg-slate-100 text-slate-400";
+            }
+            document.getElementById("mDetailSampah").classList.add("active");
+        }
+
+        async function simpanSandiBaruSheets() {
+            const passwordBaru = document.getElementById("newPass").value.trim();
+            if (!passwordBaru) {
+                openAlert("error", "Input Kosong", "Silakan ketik kata sandi baru Anda.");
+                return;
+            }
+
+            showLoading(true);
+            try {
+                const params = new URLSearchParams({ action: "updatePassword", hp: window.sessionWarga.Hp, password: passwordBaru });
+                const respon = await fetch(`${SCRIPT_URL}?${params.toString()}`, { method: "POST" });
+                const hasil = await respon.json();
+                
+                if (hasil.status === "success") {
+                    openAlert("success", "Sandi Diperbarui", "Kata sandi akun Anda berhasil diganti.");
+                    document.getElementById("newPass").value = "";
+                    muatSemuaDataServer();
+                } else { throw new Error(hasil.message); }
+            } catch (err) {
+                console.error(err);
+                openAlert("error", "Gagal Ganti Sandi", "Gagal melakukan update data password.");
+            } finally { showLoading(false); }
+        }
+
+        function pemicuPilihFoto() { document.getElementById("fileFotoInput").click(); }
+
+        async function prosesKonversiFoto(input) {
+            const file = input.files[0];
+            if (!file) return;
+
+            showLoading(true);
+            try {
+                const reader = new FileReader();
+                reader.readAsDataURL(file);
+                reader.onload = async () => {
+                    const queryParams = new URLSearchParams({ action: "updateProfilWarga", hp: window.sessionWarga.Hp });
+                    const payloadData = { image: reader.result, filename: file.name, mimeType: file.type };
+
+                    const respon = await fetch(`${SCRIPT_URL}?${queryParams.toString()}`, {
+                        method: "POST",
+                        headers: { "Content-Type": "text/plain;charset=utf-8" },
+                        body: JSON.stringify(payloadData)
+                    });
+
+                    const hasil = await respon.json();
+                    if (hasil.status === "success") {
+                        openAlert("success", "Foto Diperbarui", "Foto profil premium berhasil diunggah ke Google Drive!");
+                        muatSemuaDataServer();
+                    } else { throw new Error(hasil.message); }
+                };
+            } catch (err) {
+                console.error(err);
+                openAlert("error", "Gagal Upload", `Pesan Sistem: ${err.message}`);
+            } finally { showLoading(false); input.value = ""; }
+        }
+
+        function switchTab(idTab, tombol) {
+            document.querySelectorAll(".tab-content").forEach(el => el.classList.add("hidden"));
+            document.getElementById(idTab).classList.remove("hidden");
+            document.querySelectorAll("nav button").forEach(btn => btn.classList.remove("text-emerald-900", "active-tab-btn"));
+            tombol.classList.add("text-emerald-900", "active-tab-btn");
+        }
+
+        function togglePasswordLogin(inputId, iconId) {
+            const input = document.getElementById(inputId);
+            const icon = document.getElementById(iconId);
+            if (input.type === "password") {
+                input.type = "text"; icon.className = "fa-solid fa-eye text-sm";
+            } else {
+                input.type = "password"; icon.className = "fa-solid fa-eye-slash text-sm";
+            }
+        }
+
+        function salinRekening() {
+            navigator.clipboard.writeText(document.getElementById("noRekText").innerText).then(() => {
+                openAlert("success", "Disalin", "Nomor Rekening BCA berhasil disalin ke clipboard!");
+            });
+        }
+
+        function kirimKonfirmasiWA() {
+            const namaUser = window.sessionWarga ? window.sessionWarga.Nama : "Warga RT 04";
+            const pesanWA = `Halo Pengurus RT 04 TUNTAS, Saya *${namaUser}* ingin melakukan konfirmasi iuran bulanan via Transfer BCA. Mohon dicek ya, terima kasih.`;
+            window.open(`https://wa.me/6281234567890?text=${encodeURIComponent(pesanWA)}`, "_blank");
+        }
+
+        function showLoading(status) { document.getElementById("loading").style.display = status ? "flex" : "none"; }
+        function closeModal(idModal) { document.getElementById(idModal).classList.remove("active"); }
+        function closeAlert() { document.getElementById("customAlert").classList.remove("active"); }
+        function formatRupiah(angka) { return "Rp " + parseFloat(angka).toLocaleString("id-ID"); }
+
+        function openAlert(tipe, judul, pesan) {
+            document.getElementById("alertTitle").innerText = judul;
+            document.getElementById("alertMsg").innerText = pesan;
+            const icon = document.getElementById("alertIcon");
+            if (tipe === "success") {
+                icon.className = "w-12 h-12 mx-auto rounded-full flex items-center justify-center bg-emerald-50 text-emerald-600";
+                icon.innerHTML = `<span class="material-symbols-rounded">check_circle</span>`;
+            } else {
+                icon.className = "w-12 h-12 mx-auto rounded-full flex items-center justify-center bg-rose-50 text-rose-600";
+                icon.innerHTML = `<span class="material-symbols-rounded">warning</span>`;
+            }
+            document.getElementById("customAlert").classList.add("active");
+        }
+
+        function logoutWarga() {
+            localStorage.removeItem("tuntasWargaSession");
+            window.sessionWarga = null;
+            openAlert("success", "Keluar Akun", "Anda berhasil keluar dari Member Area.");
+            setTimeout(() => { location.reload(); }, 1250);
+        }
+    </script>
 </body>
 </html>
