@@ -1,7 +1,7 @@
 // ==========================================
 // CONFIGURATION & GLOBAL STATE
 // ==========================================
-const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbz_9MubvGvW21e_Z-1I4tM_Lg-kGZ0u1D9vS315mNqK7WqN1k_33RREhG2zS0-RjL_m/exec";
+const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzt1GIvQ2tMRz0rnBEgIoqq75858xW_xsbOf1TCDwAoADVmfeV61vVOMPxCvDIz1JG8/exec";
 
 let dbGlobal = {
     warga: [],
