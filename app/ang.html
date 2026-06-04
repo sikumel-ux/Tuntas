@@ -283,4 +283,242 @@
                     });
 
                     if (!warga) {
-                        openAlert("error", "Akses Ditolak", "Nom
+                        openAlert("error", "Akses Ditolak", "Nomor Whatsapp tidak ditemukan dalam database.");
+                        return;
+                    }
+
+                    const passDb = (warga.Password || warga.password || "").toString().trim();
+                    if (passDb !== inputPass) {
+                        openAlert("error", "Akses Ditolak", "Kata sandi yang Anda masukkan salah.");
+                        return;
+                    }
+
+                    window.sessionWarga = {
+                        Nama: warga.Nama || warga.nama,
+                        Hp: warga.Hp || warga.hp,
+                        Password: passDb,
+                        Foto: warga.Foto || warga.foto || "",
+                        Bergabung: warga.Bergabung || warga.bergabung || ""
+                    };
+
+                    localStorage.setItem("tuntasWargaSession", JSON.stringify(window.sessionWarga));
+                    document.getElementById("screen-login").classList.add("hidden");
+                    document.getElementById("screen-dashboard").classList.remove("hidden");
+                    renderSemuaHalamanWarga();
+                } else {
+                    throw new Error(hasil.message);
+                }
+            } catch (err) {
+                openAlert("error", "Error Jaringan", "Sistem gagal otentikasi data ke server.");
+            } finally {
+                showLoading(false);
+            }
+        }
+
+        async function muatDataWargaDariServer() {
+            showLoading(true);
+            try {
+                const res = await fetch(`${SCRIPT_URL}?action=readAllData`);
+                const hasil = await res.json();
+                if (hasil.status === "success") {
+                    window.dbTuntas = hasil;
+                    const syncUser = window.dbTuntas.anggota.find(w => (w.Nama || "").toLowerCase().trim() === window.sessionWarga.Nama.toLowerCase().trim());
+                    if (syncUser) {
+                        window.sessionWarga.Foto = syncUser.Foto || syncUser.foto || "";
+                        window.sessionWarga.Password = syncUser.Password || syncUser.password || "";
+                        localStorage.setItem("tuntasWargaSession", JSON.stringify(window.sessionWarga));
+                    }
+                    renderSemuaHalamanWarga();
+                }
+            } catch (e) {
+                console.error(e);
+            } finally {
+                showLoading(false);
+            }
+        }
+
+        function renderSemuaHalamanWarga() {
+            if (!window.sessionWarga) return;
+
+            document.getElementById("topNamaWarga").innerText = window.sessionWarga.Nama.toUpperCase();
+            document.getElementById("topHpWarga").innerText = `+${window.sessionWarga.Hp}`;
+
+            // Kas Realtime
+            let masuk = 0; let keluar = 0;
+            (window.dbTuntas.kas || []).forEach(k => {
+                const n = parseFloat(k.Nominal || 0);
+                if ((k.Kategori || "").toLowerCase() === 'masuk') masuk += n; else keluar += n;
+            });
+            document.getElementById("dashPemasukanKas").innerText = formatRupiah(masuk);
+            document.getElementById("dashPengeluaranKas").innerText = formatRupiah(keluar);
+            document.getElementById("dashSisaSaldoKas").innerText = formatRupiah(masuk - keluar);
+
+            const containerMutasi = document.getElementById("listMutasiKasDashboard");
+            containerMutasi.innerHTML = "";
+            (window.dbTuntas.kas || []).slice(-10).reverse().forEach(k => {
+                const isMasuk = (k.Kategori || "").toLowerCase() === 'masuk';
+                containerMutasi.innerHTML += `
+                    <div class="flex justify-between items-center py-2.5 border-b border-slate-50 text-[11px]">
+                        <div>
+                            <p class="font-bold text-slate-700 uppercase tracking-tight">${k.Keterangan}</p>
+                            <p class="text-[8px] text-slate-400 font-bold mt-0.5">${k.Tanggal}</p>
+                        </div>
+                        <p class="font-black ${isMasuk ? 'text-emerald-600' : 'text-rose-600'}">${isMasuk ? '+' : '-'} ${formatRupiah(k.Nominal)}</p>
+                    </div>`;
+            });
+
+            // Iuran Realtime
+            let totalIuran = 0;
+            const iuranSaya = (window.dbTuntas.pembayaran || []).filter(p => (p.Nama || "").toLowerCase().trim() === window.sessionWarga.Nama.toLowerCase().trim());
+            iuranSaya.forEach(p => totalIuran += parseFloat(p.Nominal || 0));
+            document.getElementById("dataTotalKontribusi").innerText = formatRupiah(totalIuran);
+
+            const gridBulan = document.getElementById("statusBulanGrid");
+            gridBulan.innerHTML = "";
+            daftarBulan.forEach(b => {
+                const lunas = iuranSaya.some(p => (p.Keterangan || "").includes(b));
+                gridBulan.innerHTML += `
+                    <div class="p-2.5 rounded-2xl border text-center flex flex-col justify-center items-center ${lunas ? 'bg-emerald-50 border-emerald-100 text-emerald-800' : 'bg-slate-50 border-slate-100 text-slate-300'}">
+                        <span class="text-[10px] font-black uppercase tracking-tight">${b.substring(0,3)}</span>
+                        <span class="text-[8px] font-black mt-0.5">${lunas ? 'LUNAS' : 'BELUM'}</span>
+                    </div>`;
+            });
+
+            // Kalender Sampah Realtime
+            renderKalenderSampah();
+
+            // Profile Tab
+            document.getElementById("infoNamaUser").innerText = window.sessionWarga.Nama.toUpperCase();
+            document.getElementById("infoHpUser").innerText = `+${window.sessionWarga.Hp}`;
+            document.getElementById("infoBergabung").innerHTML = `<i class="fa-solid fa-calendar-check mr-1.5"></i> Warga Sejak: ${window.sessionWarga.Bergabung || '-'}`;
+            
+            const img = document.getElementById("avatarImage");
+            const defIcon = document.getElementById("avatarIconDefault");
+            if (window.sessionWarga.Foto && window.sessionWarga.Foto !== "-") {
+                img.src = window.sessionWarga.Foto;
+                img.classList.remove("hidden");
+                defIcon.classList.add("hidden");
+            } else {
+                img.classList.add("hidden");
+                defIcon.classList.remove("hidden");
+            }
+        }
+
+        function renderKalenderSampah() {
+            const grid = document.getElementById("gridAngkaKalender");
+            grid.innerHTML = "";
+            const tgl = new Date();
+            const jmlHari = new Date(tgl.getFullYear(), tgl.getMonth() + 1, 0).getDate();
+            const sampahSaya = (window.dbTuntas.sampah || []).filter(s => (s.Nama || "").toLowerCase().trim() === window.sessionWarga.Nama.toLowerCase().trim());
+
+            for (let i = 1; i <= jmlHari; i++) {
+                const strHari = `${tgl.getFullYear()}-${String(tgl.getMonth()+1).padStart(2,'0')}-${String(i).padStart(2,'0')}`;
+                const log = sampahSaya.find(s => s.Tanggal === strHari);
+                
+                let cls = "bg-slate-50 text-slate-400 border-slate-100";
+                let status = "Belum Di-record";
+                
+                if (log) {
+                    if ((log.Status || "").toLowerCase() === "diambil") {
+                        cls = "bg-emerald-500 text-white border-emerald-600"; status = "Diambil Petugas";
+                    } else {
+                        cls = "bg-rose-500 text-white border-rose-600"; status = "Petugas Terlewat";
+                    }
+                }
+
+                grid.innerHTML += `<button onclick="bukaModalDetailSampah('${strHari}', '${status}')" class="p-2 text-[10px] font-black rounded-xl border shadow-3xs active:scale-90 transition-all ${cls}">${i}</button>`;
+            }
+        }
+
+        function bukaModalDetailSampah(tgl, status) {
+            document.getElementById("popTglJudul").innerText = tgl;
+            document.getElementById("popStatusTeks").innerText = status.toUpperCase();
+            document.getElementById("popJamWaktu").innerText = status.includes("Diambil") ? "Armada berhasil mengangkut sampah." : "Armada tidak melintas / libur.";
+            document.getElementById("mDetailSampah").classList.add("active");
+        }
+
+        async function updateSandiWarga() {
+            const pass = document.getElementById("newPass").value.trim();
+            if(!pass) return openAlert("error", "Input Kosong", "Masukkan kata sandi baru.");
+
+            showLoading(true);
+            try {
+                const res = await fetch(`${SCRIPT_URL}?action=updatePassword&hp=${window.sessionWarga.Hp}&password=${pass}`, { method: 'POST' });
+                const r = await res.json();
+                if(r.status === "success") {
+                    openAlert("success", "Berhasil", "Kata sandi sukses diperbarui!");
+                    document.getElementById("newPass").value = "";
+                    muatDataWargaDariServer();
+                }
+            } catch(e) {
+                openAlert("error", "Gagal", "Sistem gagal mengirim data update.");
+            } finally { showLoading(false); }
+        }
+
+        function pemicuUploadFoto() { document.getElementById("fileFotoInput").click(); }
+
+        async function unggahFotoProfil(input) {
+            const file = input.files[0];
+            if (!file) return;
+
+            showLoading(true);
+            const r = new FileReader();
+            r.readAsDataURL(file);
+            r.onload = async () => {
+                try {
+                    const res = await fetch(`${SCRIPT_URL}?action=updateProfilWarga&hp=${window.sessionWarga.Hp}`, {
+                        method: 'POST',
+                        headers: { "Content-Type": "text/plain;charset=utf-8" },
+                        body: JSON.stringify({ image: r.result, filename: file.name, mimeType: file.type })
+                    });
+                    const hasil = await res.json();
+                    if(hasil.status === "success") {
+                        openAlert("success", "Berhasil", "Foto profil premium berhasil diperbarui!");
+                        muatDataWargaDariServer();
+                    }
+                } catch(e) {
+                    openAlert("error", "Gagal", "Foto profil gagal diunggah.");
+                } finally { showLoading(false); input.value = ""; }
+            };
+        }
+
+        function gantiTab(id, btn) {
+            document.querySelectorAll(".tab-content").forEach(el => el.classList.add("hidden"));
+            document.getElementById(id).classList.remove("hidden");
+            document.querySelectorAll("nav button").forEach(b => b.classList.remove("active-tab-btn"));
+            btn.classList.add("active-tab-btn");
+        }
+
+        function togglePasswordWarga(inpId, iconId) {
+            const el = document.getElementById(inpId);
+            const ic = document.getElementById(iconId);
+            if(el.type === "password") { el.type = "text"; ic.className = "fa-solid fa-eye text-sm"; }
+            else { el.type = "password"; ic.className = "fa-solid fa-eye-slash text-sm"; }
+        }
+
+        function salinNoRek() {
+            navigator.clipboard.writeText(document.getElementById("noRekText").innerText);
+            openAlert("success", "Disalin", "Nomor rekening BCA berhasil dicala ke clipboard.");
+        }
+
+        function kirimKonfirmasiWA() {
+            window.open(`https://wa.me/6281234567890?text=${encodeURIComponent("Halo Pengurus TUNTAS RT 04, saya ingin konfirmasi pembayaran iuran kas bulanan.")}`, "_blank");
+        }
+
+        function openAlert(type, title, msg) {
+            document.getElementById("alertTitle").innerText = title;
+            document.getElementById("alertMsg").innerText = msg;
+            const icon = document.getElementById("alertIcon");
+            icon.className = "w-12 h-12 mx-auto rounded-full flex items-center justify-center " + (type === "error" ? "bg-rose-50 text-rose-600" : "bg-emerald-50 text-emerald-600");
+            icon.innerHTML = `<span class="material-symbols-rounded">${type === "error" ? "warning" : "check_circle"}</span>`;
+            document.getElementById("customAlert").classList.add("active");
+        }
+
+        function closeAlert() { document.getElementById("customAlert").classList.remove("active"); }
+        function closeModal(id) { document.getElementById(id).classList.remove("active"); }
+        function showLoading(st) { document.getElementById("loading").style.display = st ? "flex" : "none"; }
+        function formatRupiah(n) { return "Rp " + parseFloat(n || 0).toLocaleString("id-ID"); }
+        function logoutWarga() { localStorage.removeItem("tuntasWargaSession"); location.reload(); }
+    </script>
+</body>
+</html>
