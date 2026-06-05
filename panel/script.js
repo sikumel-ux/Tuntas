@@ -1,5 +1,5 @@
 // KONEKSI UTAMA API GOOGLE APPS SCRIPT & STORAGE
-const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbx9JsUb0saYvFnH8vpCn2JZu_AzdrXXXmQIcGfMW0dsTvPndFQC_CtKyLhMx_6Kjd_IEg/exec";
+const SCRIPT_URL = "https://script.google.com/macros/s/AKfycby72PVDlaaQWd4Fisw3cv2yV4znu92he0B-3AvcZWNf49BtrCe57HYIX-KhTWsLRW4a/exec";
 const DRIVE_FOLDER_ID = "1FNIuGWMADgYO2Kk-KLmemSKmDzu46LM1";
 
 // STATE DATABASE LOCAL APLIKASI
