@@ -41,9 +41,12 @@
                 <p class="text-[9px] font-bold text-slate-400 uppercase tracking-wider">Bendahara / Pengurus RT 04</p>
             </div>
         </div>
-        <div>
+        <div class="flex items-center gap-2">
             <button type="button" onclick="openModal('mAnggota')" class="w-9 h-9 flex items-center justify-center bg-white border border-slate-100 text-slate-600 rounded-xl shadow-sm transition-all active:scale-90">
                 <i class="fa-solid fa-user-plus text-xs"></i>
+            </button>
+            <button type="button" onclick="logoutAdmin()" class="w-9 h-9 flex items-center justify-center bg-rose-50 border border-rose-100 text-rose-600 rounded-xl shadow-sm transition-all active:scale-90" title="Logout">
+                <i class="fa-solid fa-power-off text-xs"></i>
             </button>
         </div>
     </header>
@@ -247,6 +250,14 @@
         loadDropdownWarga(); // Tarik daftar warga & log setoran iuran
     });
 
+    // FUNGSI LOGOUT ADMIN
+    function logoutAdmin() {
+        if(confirm('Apakah Anda yakin ingin logout dari Dashboard Pengurus?')) {
+            // Alihkan ke halaman login utama (misal index.html atau kembali ke root)
+            window.location.href = "../index.html"; 
+        }
+    }
+
     // --------------------------------------------------------
     // CORE 1: MANAJEMEN MUTASI KAS UMUM
     // --------------------------------------------------------
@@ -279,11 +290,14 @@
                     saldo += nom;
                 }
 
+                // Pengondisian pembacaan teks tanggal agar aman jika ada format string jam bawaan lama
+                const displayTanggal = tx.tanggal ? tx.tanggal.split(' ')[0] : '-';
+
                 html += `
                 <div class="bg-white p-3.5 rounded-2xl border border-slate-100 flex justify-between items-center shadow-sm">
                     <div class="space-y-0.5 pr-2 flex-1">
                         <h4 class="text-xs font-bold text-slate-800 uppercase">${escapeHtml(tx.keterangan)}</h4>
-                        <p class="text-[9px] text-slate-400 font-bold">${tx.tanggal}</p>
+                        <p class="text-[9px] text-slate-400 font-bold">${displayTanggal}</p>
                     </div>
                     <div class="flex items-center gap-3">
                         <span class="text-xs font-black ${colorTxt} whitespace-nowrap">
@@ -309,7 +323,8 @@
     }
 
     function simpanKas() {
-        const tanggal = document.getElementById('kas_tanggal').value + ' ' + new Date().toTimeString().split(' ')[0];
+        // PERBAIKAN BACKEND: Format tanggal murni YYYY-MM-DD agar sinkron saat dibaca ulang oleh browser
+        const tanggal = document.getElementById('kas_tanggal').value;
         const jenis = document.getElementById('kas_jenis').value;
         const keterangan = document.getElementById('kas_keterangan').value;
         const nominal = parseInt(document.getElementById('kas_nominal').value);
@@ -393,7 +408,8 @@
     // CORE 3: MANAJEMEN SETORAN IURAN WARGA
     // --------------------------------------------------------
     function simpanIuran() {
-        const tanggal = document.getElementById('iTglAdmin').value + ' ' + new Date().toTimeString().split(' ')[0];
+        // PERBAIKAN BACKEND: Format tanggal dibikin murni YYYY-MM-DD
+        const tanggal = document.getElementById('iTglAdmin').value;
         const nama_warga = document.getElementById('iuran_nama').value;
         const bulan = document.getElementById('iuran_bulan').value;
         const nominal = parseInt(document.getElementById('iuran_nominal').value);
@@ -444,6 +460,7 @@
             const keys = Object.keys(data).reverse();
             keys.slice(0, 10).forEach(key => {
                 const item = data[key];
+                const cleanTgl = item.tanggal ? item.tanggal.split(' ')[0] : '-';
                 htmlLog += `
                 <div class="bg-white p-3 rounded-xl border border-slate-100 flex justify-between items-center text-xs shadow-sm">
                     <div>
@@ -452,7 +469,7 @@
                     </div>
                     <div class="text-right">
                         <p class="font-black text-emerald-600">Rp ${item.nominal.toLocaleString('id-ID')}</p>
-                        <p class="text-[8px] font-medium text-slate-400">${item.tanggal.split(' ')[0]}</p>
+                        <p class="text-[8px] font-medium text-slate-400">${cleanTgl}</p>
                     </div>
                 </div>`;
             });
@@ -464,21 +481,18 @@
     // UTILITIES CONTROL ENGINE (SPA NAV & MODAL)
     // --------------------------------------------------------
     function st(screenId) {
-        // PERBAIKAN: Menyembunyikan semua elemen tab-content secara aman tanpa merusak inisialisasi awal
         const contents = document.getElementsByClassName('tab-content');
         for (let i = 0; i < contents.length; i++) { 
             contents[i].classList.remove('active');
             contents[i].style.display = 'none'; 
         }
         
-        // Membuka tab yang dituju berdasarkan ID yang benar
         const targetScr = document.getElementById('screen-' + screenId);
         if(targetScr) {
             targetScr.classList.add('active');
             targetScr.style.display = 'block';
         }
         
-        // Menata ulang warna aktif pada ikon navbar bawah
         const buttons = document.querySelectorAll('nav button');
         buttons.forEach(btn => {
             btn.classList.remove('text-emerald-900');
@@ -511,7 +525,6 @@
         setTimeout(() => alertBox.classList.add('hidden'), 4000);
     }
 
-    // PERBAIKAN: .add('hidden') diganti ke .classList.add('hidden') agar script tidak macet total
     function closeNotif() { document.getElementById('notificationAlert').classList.add('hidden'); }
     function openModal(id) { document.getElementById(id).style.setProperty('display', 'flex', 'important'); }
     function closeModal(id) { document.getElementById(id).style.setProperty('display', 'none', 'important'); }
