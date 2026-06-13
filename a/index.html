@@ -30,14 +30,14 @@
 
     <div class="w-full flex flex-col items-center">
         <div class="text-center mb-6">
-            <img src="logo.png" alt="Logo TUNTAS" class="w-16 h-16 mx-auto object-contain mb-3 drop-shadow-md brightness-110" onerror="this.src='../logo.png'">
+            <img src="../logo.png" alt="Logo TUNTAS" class="w-16 h-16 mx-auto object-contain mb-3 drop-shadow-md brightness-110" onerror="this.src='logo.png'">
             <h1 class="text-3xl font-black text-emerald-400 leading-tight">Tuntas. Admin</h1>
             <p class="text-[9px] font-bold text-slate-500 uppercase tracking-wider mt-1">Sistem Input Kas & Iuran RT 04</p>
         </div>
 
         <div class="max-w-md w-full bg-white p-6 rounded-[2rem] shadow-2xl shadow-black/40 space-y-4">
             <div>
-                <label class="text-[9px] font-bold text-slate-400 uppercase ml-1">Username / No HP Admin</label>
+                <label class="text-[9px] font-bold text-slate-400 uppercase ml-1">Username Admin</label>
                 <input type="text" id="admin_user" placeholder="Masukkan username admin" class="w-full mt-1 bg-slate-50 border border-slate-100 rounded-xl px-3 py-2.5 text-xs font-bold focus:outline-none">
             </div>
             <div>
@@ -68,7 +68,7 @@
     
     <header class="flex justify-between items-center mb-6">
         <div class="flex items-center gap-2.5">
-            <img src="logo.png" alt="Logo Tuntas" class="w-10 h-10 object-contain rounded-xl" onerror="this.src='../logo.png'">
+            <img src="../logo.png" alt="Logo Tuntas" class="w-10 h-10 object-contain rounded-xl" onerror="this.src='logo.png'">
             <div>
                 <h1 class="text-xl font-black text-emerald-900 leading-tight">Tuntas.</h1>
                 <p class="text-[9px] font-bold text-slate-400 uppercase tracking-wider">Bendahara / Pengurus RT 04</p>
@@ -267,7 +267,7 @@
 </div>
 
 <script>
-    // URL SINKRON DAFTAR WARGA (Disamakan Jalurnya Menggunakan warga.json)
+    // SINKRONISASI URL: Menggunakan warga.json agar terhubung langsung dengan modul login warga
     const urlKas    = "https://tuntas04-default-rtdb.firebaseio.com/kas_umum.json";
     const urlIuran  = "https://tuntas04-default-rtdb.firebaseio.com/iuran_warga.json";
     const urlWarga  = "https://tuntas04-default-rtdb.firebaseio.com/warga.json";
@@ -293,4 +293,4 @@
         const userInput = document.getElementById('admin_user').value.trim();
         const passInput = document.getElementById('admin_pass').value;
 
-        if (!userInput || !passInput) { alert('Username dan Password wajib diis
+        if (!userInput || !passInput) { alert('Username dan Passwo
