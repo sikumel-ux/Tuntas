@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>TUNTAS - Panel Pengurus RT 04</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" />
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <style>
+        body { font-family: 'Plus Jakarta Sans', sans-serif; -webkit-tap-highlight-color: transparent; }
+        .custom-modal { position: fixed !important; top: 0 !important; left: 0 !important; right: 0 !important; bottom: 0 !important; width: 100% !important; height: 100% !important; background-color: rgba(15, 23, 42, 0.6) !important; backdrop-filter: blur(4px) !important; display: none; align-items: center !important; justify-content: center !important; padding: 20px !important; z-index: 9999 !important; }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800 antialiased min-h-screen pb-12">
+
+<div id="notificationAlert" class="fixed top-4 left-1/2 -translate-x-1/2 w-11/12 max-w-sm z-[99999] p-4 rounded-2xl shadow-lg border text-xs font-black uppercase tracking-wide flex items-center gap-2.5 transition-all duration-300 hidden">
+    <i id="notifIcon" class="fa-solid text-base"></i>
+    <span id="notifText" class="flex-1"></span>
+</div>
+
+<nav class="bg-emerald-900 text-white sticky top-0 z-40 shadow-md">
+    <div class="max-w-4xl mx-auto px-4 py-4 flex justify-between items-center">
+        <div class="flex items-center gap-2">
+            <div class="bg-white text-emerald-900 p-1.5 rounded-xl font-black text-sm">T.</div>
+            <div>
+                <h1 class="text-sm font-black tracking-wide leading-none">PANEL PENGURUS</h1>
+                <p class="text-[9px] text-emerald-200 font-bold uppercase tracking-widest mt-0.5">Sistem RT 04 Dongkelan</p>
+            </div>
+        </div>
+        <button onclick="logoutAdmin()" class="bg-emerald-950 hover:bg-emerald-800 px-3 py-2 rounded-xl text-xs font-bold flex items-center gap-1.5 transition-all">
+            <span>Keluar Sesi</span>
+            <i class="fa-solid fa-arrow-right-from-bracket text-[10px]"></i>
+        </button>
+    </div>
+</nav>
+
+<main class="max-w-4xl mx-auto p-4 space-y-6">
+
+    <section class="grid grid-cols-2 sm:grid-cols-3 gap-3">
+        <div class="bg-white p-4 rounded-3xl border border-slate-100 shadow-sm flex flex-col justify-between">
+            <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Total Warga</span>
+            <h2 id="statTotalWarga" class="text-3xl font-black text-slate-800 mt-2">0</h2>
+        </div>
+        <div class="bg-white p-4 rounded-3xl border border-slate-100 shadow-sm flex flex-col justify-between">
+            <span class="text-[10px] font-bold text-emerald-600 uppercase tracking-wider">Warga Aktif</span>
+            <h2 id="statWargaAktif" class="text-3xl font-black text-emerald-700 mt-2">0</h2>
+        </div>
+    </section>
+
+    <section class="flex justify-between items-center bg-white p-4 rounded-3xl border border-slate-100 shadow-sm gap-3">
+        <div class="hidden sm:block">
+            <h3 class="text-xs font-black text-slate-700 uppercase tracking-wide">Daftar Manajemen Data Warga</h3>
+            <p class="text-[10px] text-slate-400">Kelola hak akses masuk, data profil, dan status keaktifan</p>
+        </div>
+        <button onclick="openModal('mTambahWarga')" class="w-full sm:w-auto bg-emerald-900 text-white px-5 py-3 rounded-2xl text-xs font-black uppercase tracking-wider shadow-sm flex items-center justify-center gap-2 active:scale-95 transition-all">
+            <i class="fa-solid fa-user-plus text-[10px]"></i>
+            <span>Tambah Warga Baru</span>
+        </button>
+    </section>
+
+    <section class="bg-white rounded-[2rem] border border-slate-100 shadow-sm overflow-hidden">
+        <div class="p-4 bg-slate-50/50 border-b border-slate-100 flex items-center justify-between">
+            <span class="text-[10px] font-black text-slate-500 uppercase tracking-widest">Nama Lengkap / Username</span>
+            <span class="text-[10px] font-black text-slate-500 uppercase tracking-widest text-right">Opsi Status</span>
+        </div>
+        <div id="wargaContainer" class="divide-y divide-slate-100">
+            <div class="p-6 text-center text-xs text-slate-400 font-bold uppercase tracking-wider">Sedang memuat data warga...</div>
+        </div>
+    </section>
+</main>
+
+<div id="mTambahWarga" class="custom-modal" onclick="if(event.target==this)closeModal('mTambahWarga')">
+    <div class="bg-white w-full max-w-md rounded-[2rem] p-6 space-y-4 shadow-xl max-h-[90vh] overflow-y-auto">
+        <div class="flex justify-between items-center border-b pb-3">
+            <div>
+                <h3 class="font-black uppercase text-emerald-900 text-sm tracking-wide">Tambah Warga Baru</h3>
+                <p class="text-[9px] text-slate-400 uppercase tracking-wider mt-0.5">Daftarkan akun warga baru RT 04</p>
+            </div>
+            <button onclick="closeModal('mTambahWarga')" class="text-slate-400 hover:text-slate-600"><i class="fa-solid fa-xmark text-lg"></i></button>
+        </div>
+        
+        <form id="formTambahWarga" onsubmit="simpanWargaBaru(event)" class="space-y-3">
+            <div>
+                <label class="text-[9px] font-bold text-slate-400 uppercase ml-1">Nama Lengkap Warga</label>
+                <input type="text" id="addNama" placeholder="Contoh: Ahmad Subari" class="w-full mt-1 bg-slate-50 border rounded-xl p-3 text-xs font-bold text-slate-700 focus:outline-none focus:border-emerald-600 transition-colors" required>
+            </div>
+            <div>
+                <label class="text-[9px] font-bold text-slate-400 uppercase ml-1">Nomor HP / WhatsApp (Untuk Username)</label>
+                <input type="tel" id="addUsername" placeholder="Contoh: 08123456789" class="w-full mt-1 bg-slate-50 border rounded-xl p-3 text-xs font-mono font-bold text-slate-700 focus:outline-none focus:border-emerald-600 transition-colors" required>
+            </div>
+            <div>
+                <label class="text-[9px] font-bold text-slate-400 uppercase ml-1">Kata Sandi (Password Login)</label>
+                <input type="text" id="addPassword" placeholder="Masukkan password akun warga" class="w-full mt-1 bg-slate-50 border rounded-xl p-3 text-xs font-bold text-slate-700 focus:outline-none focus:border-emerald-600 transition-colors" required>
+            </div>
+            <div class="grid grid-cols-2 gap-2">
+                <div>
+                    <label class="text-[9px] font-bold text-slate-400 uppercase ml-1">Bulan Bergabung</label>
+                    <input type="text" id="addBulan" placeholder="Contoh: Juni 2026" class="w-full mt-1 bg-slate-50 border rounded-xl p-3 text-xs font-bold text-slate-700 focus:outline-none focus:border-emerald-600 transition-colors" required>
+                </div>
+                <div>
+                    <label class="text-[9px] font-bold text-slate-400 uppercase ml-1">Foto Profil (URL)</label>
+                    <input type="text" id="addFoto" value="default.png" class="w-full mt-1 bg-slate-50 border rounded-xl p-3 text-xs text-slate-500 focus:outline-none focus:border-emerald-600 transition-colors" required>
+                </div>
+            </div>
+            <button type="submit" class="w-full bg-emerald-900 text-white p-3.5 rounded-xl text-xs font-black uppercase tracking-wider shadow-md transition-all active:scale-95 mt-2">Daftarkan Warga Baru</button>
+        </form>
+    </div>
+</div>
+
+<script>
+    // Amankan URL Menggunakan Project ID Firebase Kamu yang Valid (tuntas-04)
+    const DB_HOST = "https://tuntas-04-default-rtdb.asia-southeast1.firebasedatabase.app";
+    const urlWarga = DB_HOST + "/warga_rt04.json";
+
+    // Proteksi Sesi: Jika bukan admin, tendang balik ke halaman login awal
+    window.addEventListener('DOMContentLoaded', () => {
+        const currentRole = localStorage.getItem('tuntas_session_role');
+        if (currentRole !== 'admin') {
+            window.location.href = '../index.html';
+        } else {
+            muatDataWarga();
+        }
+    });
+
+    // --------------------------------------------------------
+    // CORE READ DATA WARGA & STATISTIK
+    // --------------------------------------------------------
+    function muatDataWarga() {
+        fetch(urlWarga)
+        .then(res => res.json())
+        .then(data => {
+            const container = document.getElementById('wargaContainer');
+            container.innerHTML = "";
+
+            if (!data) {
+                container.innerHTML = `<div class="p-8 text-center text-xs text-slate-400 font-bold uppercase tracking-wider">Belum ada data warga terdaftar.</div>`;
+                document.getElementById('statTotalWarga').innerText = "0";
+                document.getElementById('statWargaAktif').innerText = "0";
+                return;
+            }
+
+            let totalWarga = 0;
+            let wargaAktif = 0;
+
+            Object.keys(data).forEach(key => {
+                const warga = data[key];
+                totalWarga++;
+                
+                // Set default true jika field status_aktif kosong di database
+                const isAktif = warga.status_aktif !== false;
+                if (isAktif) wargaAktif++;
+
+                // Pengolahan Gambar Profil Otomatis & Dinamis
+                let avatarSrc = warga.foto;
+                if(!avatarSrc || avatarSrc === 'default.png') {
+                    const inisial = warga.nama ? warga.nama.substring(0, 2).toUpperCase() : "WR";
+                    avatarSrc = `https://placehold.co/100x100/064e3b/ffffff?text=${inisial}`;
+                }
+
+                const itemHtml = `
+                    <div class="p-4 flex items-center justify-between hover:bg-slate-50/80 transition-colors">
+                        <div class="flex items-center gap-3">
+                            <img src="${avatarSrc}" alt="Foto Profil" class="w-10 h-10 rounded-full object-cover border border-slate-200 shadow-sm" onerror="this.src='https://placehold.co/100x100/064e3b/ffffff?text=WR'">
+                            <div>
+                                <h4 class="text-xs font-black text-slate-800 uppercase tracking-wide">${warga.nama || 'Tanpa Nama'}</h4>
+                                <p class="text-[10px] font-mono font-bold text-slate-400 mt-0.5">${warga.username || '-'} • Pass: <span class="text-emerald-800">${warga.password || '-'}</span></p>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <button onclick="toggleStatusWarga('${key}', ${isAktif})" class="px-3 py-1.5 rounded-xl text-[10px] font-black uppercase tracking-wider transition-all shadow-sm ${isAktif ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' : 'bg-rose-50 text-rose-600 border border-rose-200'}">
+                                ${isAktif ? 'Aktif' : 'Nonaktif'}
+                            </button>
+                            <button onclick="hapusWarga('${key}')" class="w-8 h-8 rounded-xl bg-slate-50 border border-slate-200 text-slate-400 hover:text-rose-600 hover:bg-rose-50 flex items-center justify-center transition-all active:scale-90">
+                                <i class="fa-solid fa-trash-can text-xs"></i>
+                            </button>
+                        </div>
+                    </div>
+                `;
+                container.insertAdjacentHTML('beforeend', itemHtml);
+            });
+
+            // Update Panel Atas Statistik Data
+            document.getElementById('statTotalWarga').innerText = totalWarga;
+            document.getElementById('statWargaAktif').innerText = wargaAktif;
+        })
+        .catch(() => showNotif('Gagal mengambil data dari database!', 'gagal'));
+    }
+
+    // --------------------------------------------------------
+    // CORE WRITE, UPDATE, & DELETE ENGINE
+    // --------------------------------------------------------
+    function simpanWargaBaru(e) {
+        e.preventDefault();
+
+        const nama = document.getElementById('addNama').value.trim();
+        const username = document.getElementById('addUsername').value.trim();
+        const password = document.getElementById('addPassword').value.trim();
+        const bulan_bergabung = document.getElementById('addBulan').value.trim();
+        const foto = document.getElementById('addFoto').value.trim();
+
+        const dataBaru = {
+            nama: nama,
+            username: username,
+            password: password,
+            bulan_bergabung: bulan_bergabung,
+            foto: foto,
+            status_aktif: true
+        };
+
+        fetch(urlWarga, {
+            method: 'POST',
+            body: JSON.stringify(dataBaru),
+            headers: { 'Content-Type': 'application/json' }
+        })
+        .then(() => {
+            closeModal('mTambahWarga');
+            document.getElementById('formTambahWarga').reset();
+            document.getElementById('addFoto').value = "default.png";
+            showNotif('Warga baru berhasil didaftarkan!', 'sukses');
+            muatDataWarga();
+        })
+        .catch(() => showNotif('Gagal mendaftarkan data baru!', 'gagal'));
+    }
+
+    function toggleStatusWarga(key, currentStatus) {
+        const targetUrl = `${DB_HOST}/warga_rt04/${key}.json`;
+        
+        fetch(targetUrl, {
+            method: 'PATCH',
+            body: JSON.stringify({ status_aktif: !currentStatus }),
+            headers: { 'Content-Type': 'application/json' }
+        })
+        .then(() => {
+            showNotif('Status warga berhasil diubah!', 'sukses');
+            muatDataWarga();
+        })
+        .catch(() => showNotif('Gagal mengubah status warga!', 'gagal'));
+    }
+
+    function hapusWarga(key) {
+        if (!confirm("Apakah kamu yakin ingin menghapus data warga ini secara permanen dari sistem?")) return;
+        
+        const targetUrl = `${DB_HOST}/warga_rt04/${key}.json`;
+
+        fetch(targetUrl, { method: 'DELETE' })
+        .then(() => {
+            showNotif('Data warga berhasil dihapus!', 'sukses');
+            muatDataWarga();
+        })
+        .catch(() => showNotif('Gagal menghapus data warga!', 'gagal'));
+    }
+
+    function logoutAdmin() {
+        localStorage.clear();
+        showNotif('Keluar sesi admin...', 'sukses');
+        setTimeout(() => { window.location.href = '../index.html'; }, 1000);
+    }
+
+    // --------------------------------------------------------
+    // UTILITIES MODAL & ALERTS CONTROL
+    // --------------------------------------------------------
+    function showNotif(msg, type) {
+        const alertBox = document.getElementById('notificationAlert');
+        const icon = document.getElementById('notifIcon');
+        const text = document.getElementById('notifText');
+
+        text.innerText = msg;
+        alertBox.classList.remove('hidden', 'bg-emerald-50', 'border-emerald-200', 'text-emerald-800', 'bg-rose-50', 'border-rose-200', 'text-rose-800');
+        icon.classList.remove('fa-circle-check', 'text-emerald-600', 'fa-circle-xmark', 'text-rose-600');
+
+        if(type === 'sukses') {
+            alertBox.classList.add('bg-emerald-50', 'border-emerald-200', 'text-emerald-800');
+            icon.classList.add('fa-circle-check', 'text-emerald-600');
+        } else {
+            alertBox.classList.add('bg-rose-50', 'border-rose-200', 'text-rose-800');
+            icon.classList.add('fa-circle-xmark', 'text-rose-600');
+        }
+        alertBox.classList.remove('hidden');
+        setTimeout(() => alertBox.classList.add('hidden'), 3000);
+    }
+
+    function openModal(id) { document.getElementById(id).style.setProperty('display', 'flex', 'important'); }
+    function closeModal(id) { document.getElementById(id).style.setProperty('display', 'none', 'important'); }
+</script>
+
+</body>
+</html>
