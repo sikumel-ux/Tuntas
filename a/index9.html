@@ -329,7 +329,7 @@
                     showNotif('Foto Profil Berhasil Diperbarui!', 'sukses');
                 } catch (err) {
                     showNotif('Gagal mengunggah gambar', 'gagal');
-                } military {
+                } finally {
                     document.getElementById('loadingOverlay').style.display = 'none';
                 }
             };
@@ -421,7 +421,6 @@
             const kasKredit = { jenis: 'masuk', nominal: body.nominal, keterangan: formatKeteranganIuran, tanggal: body.tanggal };
             fetch(`${DB_URL}/kas_rt04.json`, { method: 'POST', body: JSON.stringify(kasKredit) }).then(() => { muatSistemKas(); muatRiwayatIuran(); });
 
-            // FORMAT LINK REVISI SESUAI REQUEST (?id=)
             const linkKuitansi = `https://sikumel-ux.github.io/Tuntas/kuitansi/?id=${token}`;
             document.getElementById('textKodeKuitansi').innerText = `TOKEN: ${token}\nURL: ${linkKuitansi}`;
             document.getElementById('boxKuitansiLink').classList.remove('hidden');
@@ -573,6 +572,7 @@
     function openModal(id) { document.getElementById(id).classList.add('active'); }
     function closeModal(id) { document.getElementById(id).classList.remove('active'); }
 
+    // NOTIF SYSTEM FIXED WITH TOAST TIMER CONTROL
     function showNotif(msg, type) {
         const box = document.getElementById('notificationAlert'); const icon = document.getElementById('notifIcon'); const text = document.getElementById('notifText'); text.innerText = msg;
         box.className = `fixed top-4 left-1/2 -translate-x-1/2 w-11/12 max-w-sm z-[99999] p-4 rounded-2xl shadow-lg border text-xs font-black uppercase tracking-wide flex items-center gap-2.5 transition-all duration-300 ${type==='sukses'?'bg-emerald-50 border-emerald-200 text-emerald-800':'bg-rose-50 border-rose-200 text-rose-800'}`;
